@@ -5,23 +5,20 @@ import createMovieWrapper from './view/movie-wrapper';
 import createSortCardTempale from './view/sort';
 import createShowMoreButton from './view/show-more-button';
 import createFilmDetailsTempale from './view/film-details';
+import render from './utils';
 
 const CARD_COUNT = 5;
 const CARD_COUNT_EXTRA = 2;
 
-const render = (container, template, place) => {
-  container.insertAdjacentHTML(place, typeof template === 'function' ? template() : template);
-};
+const mainElement = document.querySelector('.main');
+const headerElement = document.querySelector('.header');
 
-const siteMainElement = document.querySelector('.main');
-const siteHeaderElement = document.querySelector('.header');
+render(headerElement, createUserProfileTempale, 'beforeend');
+render(mainElement, createMenuTempale, 'beforeend');
+render(mainElement, createSortCardTempale, 'beforeend');
+render(mainElement, '<section class="films"></section>', 'beforeend');
 
-render(siteHeaderElement, createUserProfileTempale, 'beforeend');
-render(siteMainElement, createMenuTempale, 'beforeend');
-render(siteMainElement, createSortCardTempale, 'beforeend');
-render(siteMainElement, '<section class="films"></section>', 'beforeend');
-
-const allMovieWrapper = siteMainElement.querySelector('.films');
+const allMovieWrapper = mainElement.querySelector('.films');
 
 const renderCardContainer = (classNameSection, title, cardCount, classNameContainer) => {
   render(allMovieWrapper, createMovieWrapper(classNameSection, title), 'beforeend');
@@ -37,4 +34,4 @@ renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT
 
 const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
 render(movieWrapperMain, createShowMoreButton, 'beforeend');
-render(siteMainElement, createFilmDetailsTempale, 'beforeend');
+render(mainElement, createFilmDetailsTempale, 'beforeend');
