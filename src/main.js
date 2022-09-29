@@ -5,7 +5,12 @@ import createMovieWrapper from './view/movie-wrapper';
 import createSortCardTempale from './view/sort';
 import createShowMoreButton from './view/show-more-button';
 import createFilmDetailsTempale from './view/film-details';
-import render from './utils';
+import { render } from './utils';
+import generateCardFilm from './mock/card-film';
+
+const FILM_COUNT = 5;
+
+const filmCards = new Array(FILM_COUNT).fill().map(generateCardFilm);
 
 const CARD_COUNT = 5;
 const CARD_COUNT_EXTRA = 2;
@@ -24,7 +29,7 @@ const renderCardContainer = (classNameSection, title, cardCount, classNameContai
   render(allMovieWrapper, createMovieWrapper(classNameSection, title), 'beforeend');
   const movieWrapper = document.querySelector(classNameContainer);
   for (let i = 0; i < cardCount; i++) {
-    render(movieWrapper, createMovieCardTemplate, 'beforeend');
+    render(movieWrapper, createMovieCardTemplate(filmCards[i]), 'beforeend');
   }
 };
 
@@ -34,4 +39,4 @@ renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT
 
 const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
 render(movieWrapperMain, createShowMoreButton, 'beforeend');
-render(mainElement, createFilmDetailsTempale, 'beforeend');
+render(mainElement, createFilmDetailsTempale(filmCards[1]), 'beforeend');
