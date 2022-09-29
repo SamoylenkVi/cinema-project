@@ -8,7 +8,7 @@ import createFilmDetailsTempale from './view/film-details';
 import { render } from './utils';
 import generateCardFilm from './mock/card-film';
 
-const FILM_COUNT = 5;
+const FILM_COUNT = 20;
 
 const filmCards = new Array(FILM_COUNT).fill().map(generateCardFilm);
 
@@ -19,7 +19,7 @@ const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
 render(headerElement, createUserProfileTempale, 'beforeend');
-render(mainElement, createMenuTempale, 'beforeend');
+render(mainElement, createMenuTempale(filmCards), 'beforeend');
 render(mainElement, createSortCardTempale, 'beforeend');
 render(mainElement, '<section class="films"></section>', 'beforeend');
 

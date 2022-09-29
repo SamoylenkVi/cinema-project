@@ -28,7 +28,7 @@ const createCommentItem = (items) => {
       </div>
     </li>`;
   });
-  return CommentMarkup.join();
+  return CommentMarkup.join('');
 };
 
 const createFilmDetailsTempale = (movieCard) => {
@@ -122,7 +122,7 @@ const createFilmDetailsTempale = (movieCard) => {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comment.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createCommentItem(comment)};
+            ${createCommentItem(comment)}
           </ul>
 
           <div class="film-details__new-comment">
