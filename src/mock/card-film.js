@@ -1,5 +1,7 @@
 import { getRandomInteger } from '../utils';
 
+const POSTERS_URL = './images/posters/';
+
 const filmNames = [
   'Земля кочевников',
   'Вестсайдская история',
@@ -82,55 +84,23 @@ const description = [
   'Пострадав в результате несчастного случая, богатый аристократ Филипп нанимает в помощники человека, который менее всего подходит для этой работы, – молодого жителя предместья Дрисса, только что освободившегося из тюрьмы. Несмотря на то, что Филипп прикован к инвалидному креслу, Дриссу удается привнести в размеренную жизнь аристократа дух приключений.',
 ];
 
-const user = [
-  'Пашка Севостьянов',
-  'Людка Филатова',
-  'Тема Филатов',
-  'Ваня Иванов',
-  'Сергей Сергеев',
-];
-
-const commentText = [
-  'Самый переоцененный фильм в истории кинематографа.',
-  'Фильм о том, как великие поступки можно совершать, будучи самым простым человеком.',
-  'Классика кинематографа!',
-  'Хлам и крошево',
-  'Эпичный конец',
-];
-
-const commentDate = [
-  '2019-05-11',
-  '2019-08-16',
-  '2020-03-20',
-  '2022-03-15',
-  '2020-04-09',
-];
-
-const emotion = [
-  'smile',
-  'sleeping',
-  'puke',
-  'angry',
+const postersFilm = [
+  'made-for-each-other.png',
+  'popeye-meets-sinbad.png',
+  'sagebrush-trail.jpg',
+  'santa-claus-conquers-the-martians.jpg',
+  'the-dance-of-life.jpg',
+  'the-great-flamarion.jpg',
+  'the-man-with-the-golden-arm.jpg',
 ];
 
 const getRandomItem = (items) => items[getRandomInteger(0, items.length - 1)];
 
 const getRandomItems = (items) => items.filter(() => Boolean(getRandomInteger(0, 1)));
 
-const generatePoster = () => {
-  const posters = [
-    'made-for-each-other.png',
-    'popeye-meets-sinbad.png',
-    'sagebrush-trail.jpg',
-    'santa-claus-conquers-the-martians.jpg',
-    'the-dance-of-life.jpg',
-    'the-great-flamarion.jpg',
-    'the-man-with-the-golden-arm.jpg',
-  ];
-
+const generatePoster = (posters) => {
   const randomIndex = getRandomInteger(0, posters.length - 1);
-  const url = './images/posters/';
-  return url + posters[randomIndex];
+  return POSTERS_URL + posters[randomIndex];
 };
 
 const generateDateProdaction = () => {
@@ -147,25 +117,8 @@ const generateDateProdaction = () => {
   return new Date(productionYear[randomIndex]);
 };
 
-const createComment = () => ({
-  user: getRandomItem(user),
-  emotion: getRandomItem(emotion),
-  commentText: getRandomItem(commentText),
-  commentDate: getRandomItem(commentDate),
-});
-
-const genereteComments = () => {
-  const commentCount = getRandomInteger(0, 10);
-  const comments = [];
-  for (let i = 0; i < commentCount; i++) {
-    const comment = createComment();
-    comments.push(comment);
-  }
-  return comments;
-};
-
-const generateCardFilm = () => ({
-  poster: generatePoster(),
+const generateCardFilm = (id) => ({
+  poster: generatePoster(postersFilm),
   name: getRandomItem(filmNames),
   producer: getRandomItem(producers),
   screenwriters: getRandomItems(writers),
@@ -175,7 +128,7 @@ const generateCardFilm = () => ({
   filmDuration: getRandomItem(filmDuration),
   country: getRandomItem(country),
   genre: getRandomItems(genre),
-  comment: genereteComments(),
+  commentId: id,
   description: getRandomItem(description),
   ageRating: getRandomItem(ageRating),
   isWatchlist: Boolean(getRandomInteger(0, 1)),
@@ -183,4 +136,6 @@ const generateCardFilm = () => ({
   isFavorite: Boolean(getRandomInteger(0, 1)),
 });
 
-export default generateCardFilm;
+export {
+  generateCardFilm, getRandomItem,
+};
