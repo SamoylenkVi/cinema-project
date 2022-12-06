@@ -6,8 +6,8 @@ const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:m';
 const ACTIVE_BUTTON_CLASS = 'film-details__control-button--active';
 
 const createGenreItem = (items) => {
-  const GenreMarkup = items.map((item) => `<span class="film-details__genre">${item}</span>`);
-  return GenreMarkup.join('');
+  const genreMarkup = items.map((item) => `<span class="film-details__genre">${item}</span>`);
+  return genreMarkup.join('');
 };
 
 const createCommentItem = (items) => {
