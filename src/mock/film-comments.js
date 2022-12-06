@@ -1,7 +1,9 @@
 import { getRandomInteger } from '../utils';
 import { getRandomItem } from './card-film';
 
-const COMMENTS_COUNT = 20;
+import { FILM_COUNT } from '../constants';
+
+const COMMENT_COUNT = 5;
 
 const user = [
   'Пашка Севостьянов',
@@ -42,10 +44,10 @@ const createComment = () => ({
 });
 
 const generateComments = () => {
-  const commentCount = getRandomInteger(0, 10);
+  const commentCount = getRandomInteger(0, COMMENT_COUNT);
   const filmComments = [];
   for (let i = 0; i < commentCount; i++) {
-    const comment = createComment(i);
+    const comment = createComment();
     filmComments.push(comment);
   }
   return filmComments;
@@ -54,8 +56,8 @@ const generateComments = () => {
 const allComments = {};
 
 const generateFilmComments = () => {
-  for (let i = 0; i < COMMENTS_COUNT; i++) {
-    allComments[i] = generateComments();
+  for (let cardId = 0; cardId < FILM_COUNT; cardId++) {
+    allComments[cardId] = generateComments();
   }
 };
 

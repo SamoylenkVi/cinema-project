@@ -1,3 +1,5 @@
+const dayjs = require('dayjs');
+
 const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
@@ -12,20 +14,21 @@ const render = (container, template, place) => {
 };
 
 const cutText = (text, limit) => {
-  // eslint-disable-next-line no-param-reassign
-  text = text.trim();
-  if (text.length <= limit) return text;
-  // eslint-disable-next-line no-param-reassign
-  text = text.slice(0, limit - 1);
-  const lastSpace = text.lastIndexOf(' ');
-  if (lastSpace > 0) {
-    text.substr(0, lastSpace);
-  }
-  return `${text}...`;
+  let croppedText = text.trim();
+  if (croppedText.length <= limit) return croppedText;
+  croppedText = croppedText.slice(0, limit - 1).trimEnd();
+
+  return `${croppedText}...`;
 };
 
-const addActiveButtonClass = (button, className) => (button ? className : '');
+const isActiveButtonClass = (button, className) => (button ? className : '');
+
+const convertsDate = (date, format) => dayjs(date).format(format);
 
 export {
-  render, getRandomInteger, cutText, addActiveButtonClass,
+  render,
+  getRandomInteger,
+  cutText,
+  isActiveButtonClass,
+  convertsDate,
 };

@@ -1,13 +1,13 @@
-import { addActiveButtonClass } from '../utils';
+import { isActiveButtonClass, convertsDate } from '../utils';
 import allComments from '../mock/film-comments';
 
-const dayjs = require('dayjs');
-
+const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
+const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:m';
 const ACTIVE_BUTTON_CLASS = 'film-details__control-button--active';
 
-const createGenerItem = (items) => {
-  const GenerMarkup = items.map((item) => `<span class="film-details__genre">${item}</span>`);
-  return GenerMarkup.join('');
+const createGenreItem = (items) => {
+  const GenreMarkup = items.map((item) => `<span class="film-details__genre">${item}</span>`);
+  return GenreMarkup.join('');
 };
 
 const createCommentItem = (items) => {
@@ -23,7 +23,7 @@ const createCommentItem = (items) => {
         <p class="film-details__comment-text">${commentText}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${user}</span>
-          <span class="film-details__comment-day">${dayjs(commentDate).format('YYYY/MM/DD HH:m')}</span>
+          <span class="film-details__comment-day">${convertsDate(commentDate, COMMENT_DATE_FORMAT)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -32,8 +32,9 @@ const createCommentItem = (items) => {
   return CommentMarkup.join('');
 };
 
-const createFilmDetailsTempale = (movieCard) => {
+const createFilmDetailsTemplate = (movieCard) => {
   const {
+    id,
     name,
     rating,
     poster,
@@ -44,13 +45,14 @@ const createFilmDetailsTempale = (movieCard) => {
     filmDuration,
     country,
     description,
-    isWatchlist,
+    isWatchList,
     isWatched,
     isFavorite,
     genre,
     ageRating,
-    commentId,
   } = movieCard;
+
+  const cardComments = allComments[id];
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -88,7 +90,7 @@ const createFilmDetailsTempale = (movieCard) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${dayjs(productionYear).format('DD MMMM YYYY')}</td>
+                <td class="film-details__cell">${convertsDate(productionYear, RELEASE_DATE_FORMAT)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
@@ -99,9 +101,9 @@ const createFilmDetailsTempale = (movieCard) => {
                 <td class="film-details__cell">${country}</td>
               </tr>
               <tr class="film-details__row">
-                <td class="film-details__term">${(genre.length > 1 ? 'Geners' : 'Gener')} </td>
+                <td class="film-details__term">${(genre.length > 1 ? 'Genres' : 'Genre')} </td>
                 <td class="film-details__cell">
-                ${createGenerItem(genre)}
+                ${createGenreItem(genre)}
               </tr>
             </table>
 
@@ -112,18 +114,18 @@ const createFilmDetailsTempale = (movieCard) => {
         </div>
 
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatchlist, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button ${isActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+          <button type="button" class="film-details__control-button ${isActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+          <button type="button" class="film-details__control-button ${isActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
         </section>
       </div>
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${allComments[commentId].length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${cardComments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createCommentItem(allComments[commentId])}
+            ${createCommentItem(cardComments)}
           </ul>
 
           <div class="film-details__new-comment">
@@ -161,4 +163,4 @@ const createFilmDetailsTempale = (movieCard) => {
   </section>`;
 };
 
-export default createFilmDetailsTempale;
+export default createFilmDetailsTemplate;

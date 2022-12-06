@@ -77,6 +77,14 @@ const filmDuration = [
   '3h 15m',
 ];
 
+const productionYear = [
+  '2019-05-11',
+  '2015-08-16',
+  '1974-03-20',
+  '2001-03-15',
+  '1997-04-09',
+];
+
 const description = [
   'Фрэнк Эбегнейл успел поработать врачом, адвокатом и пилотом на пассажирской авиалинии – и все это до достижения полного совершеннолетия в 21 год. Мастер в обмане и жульничестве, он также обладал искусством подделки документов, что в конечном счете принесло ему миллионы долларов, которые он получил по фальшивым чекам Агент ФБР Карл Хэнрэтти отдал бы все, чтобы схватить Фрэнка и привлечь к ответственности за свои деяния, но Фрэнк всегда опережает его на шаг, заставляя продолжать погоню.',
   'Повелитель сил тьмы Саурон направляет свою бесчисленную армию под стены Минас-Тирита, крепости Последней Надежды. Он предвкушает близкую победу, но именно это мешает ему заметить две крохотные фигурки — хоббитов, приближающихся к Роковой Горе, где им предстоит уничтожить Кольцо Всевластья.',
@@ -103,35 +111,27 @@ const generatePoster = (posters) => {
   return POSTERS_URL + posters[randomIndex];
 };
 
-const generateDateProdaction = () => {
-  const productionYear = [
-    '2019-05-11',
-    '2015-08-16',
-    '1974-03-20',
-    '2001-03-15',
-    '1997-04-09',
-  ];
+const generateDateProdaction = (year) => {
+  const randomIndex = getRandomInteger(0, year.length - 1);
 
-  const randomIndex = getRandomInteger(0, productionYear.length - 1);
-
-  return new Date(productionYear[randomIndex]);
+  return new Date(year[randomIndex]);
 };
 
 const generateCardFilm = (id) => ({
+  id,
   poster: generatePoster(postersFilm),
   name: getRandomItem(filmNames),
   producer: getRandomItem(producers),
   screenwriters: getRandomItems(writers),
   actors: getRandomItems(actors),
   rating: getRandomItem(filmRating),
-  productionYear: generateDateProdaction(),
+  productionYear: generateDateProdaction(productionYear),
   filmDuration: getRandomItem(filmDuration),
   country: getRandomItem(country),
   genre: getRandomItems(genre),
-  commentId: id,
   description: getRandomItem(description),
   ageRating: getRandomItem(ageRating),
-  isWatchlist: Boolean(getRandomInteger(0, 1)),
+  isWatchList: Boolean(getRandomInteger(0, 1)),
   isWatched: Boolean(getRandomInteger(0, 1)),
   isFavorite: Boolean(getRandomInteger(0, 1)),
 });

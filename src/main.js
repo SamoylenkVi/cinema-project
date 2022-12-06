@@ -1,26 +1,26 @@
-import createUserProfileTempale from './view/user-profile';
-import createMenuTempale from './view/menu';
+import createUserProfileTemplate from './view/user-profile';
+import createMenuTemplate from './view/menu';
 import createMovieCardTemplate from './view/ movie-card';
 import createMovieWrapper from './view/movie-wrapper';
-import createSortCardTempale from './view/sort';
+import createSortCardTemplate from './view/sort';
 import createShowMoreButton from './view/show-more-button';
-import createFilmDetailsTempale from './view/film-details';
+import createFilmDetailsTemplate from './view/film-details';
 import { render } from './utils';
 import { generateCardFilm } from './mock/card-film';
+import { FILM_COUNT } from './constants';
 
-const FILM_COUNT = 20;
 const TASK_COUNT_PER_STEP = 5;
 const CARD_COUNT_EXTRA = 2;
 
-// eslint-disable-next-line max-len
-const filmCards = new Array(FILM_COUNT).fill().map((element, idElement) => generateCardFilm(idElement));
-
+const filmCards = new Array(FILM_COUNT)
+  .fill()
+  .map((element, idElement) => generateCardFilm(idElement));
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
-render(headerElement, createUserProfileTempale, 'beforeend');
-render(mainElement, createMenuTempale(filmCards), 'beforeend');
-render(mainElement, createSortCardTempale, 'beforeend');
+render(headerElement, createUserProfileTemplate, 'beforeend');
+render(mainElement, createMenuTemplate(filmCards), 'beforeend');
+render(mainElement, createSortCardTemplate, 'beforeend');
 render(mainElement, '<section class="films"></section>', 'beforeend');
 
 const allMovieWrapper = mainElement.querySelector('.films');
@@ -62,4 +62,4 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
 renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
 renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
 
-render(mainElement, createFilmDetailsTempale(filmCards[0]), 'beforeend');
+render(mainElement, createFilmDetailsTemplate(filmCards[0]), 'beforeend');
