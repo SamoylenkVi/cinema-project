@@ -1,4 +1,4 @@
-import { isActiveButtonClass, convertsDate } from '../utils';
+import { addActiveButtonClass, convertsDate } from '../utils';
 import allComments from '../mock/film-comments';
 
 const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
@@ -114,9 +114,9 @@ const createFilmDetailsTemplate = (movieCard) => {
         </div>
 
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button ${isActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button ${isActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button ${isActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
         </section>
       </div>
 

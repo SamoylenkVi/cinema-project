@@ -21,7 +21,7 @@ const cutText = (text, limit) => {
   return `${croppedText}...`;
 };
 
-const isActiveButtonClass = (button, className) => (button ? className : '');
+const addActiveButtonClass = (shouldAddClass, className) => (shouldAddClass ? className : '');
 
 const convertsDate = (date, format) => dayjs(date).format(format);
 
@@ -29,6 +29,6 @@ export {
   render,
   getRandomInteger,
   cutText,
-  isActiveButtonClass,
+  addActiveButtonClass,
   convertsDate,
 };
