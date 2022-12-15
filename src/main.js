@@ -1,11 +1,13 @@
 import createUserProfileTemplate from './view/user-profile';
-import createMenuTemplate from './view/menu';
+import SiteMenuView from './view/menu';
 import createMovieCardTemplate from './view/ movie-card';
 import createMovieWrapper from './view/movie-wrapper';
 import createSortCardTemplate from './view/sort';
 import createShowMoreButton from './view/show-more-button';
-import createFilmDetailsTemplate from './view/film-details';
-import { render } from './utils';
+// import createFilmDetailsTemplate from './view/film-details';
+import {
+  render, renderElement, RenderPosition,
+} from './utils';
 import { generateCardFilm } from './mock/card-film';
 import { FILM_COUNT } from './constants';
 
@@ -19,7 +21,7 @@ const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
 render(headerElement, createUserProfileTemplate, 'beforeend');
-render(mainElement, createMenuTemplate(filmCards), 'beforeend');
+renderElement(mainElement, new SiteMenuView(filmCards).getElement(), RenderPosition.AFTERBEGIN);
 render(mainElement, createSortCardTemplate, 'beforeend');
 render(mainElement, '<section class="films"></section>', 'beforeend');
 
@@ -62,4 +64,4 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
 renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
 renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
 
-render(mainElement, createFilmDetailsTemplate(filmCards[0]), 'beforeend');
+// render(mainElement, createFilmDetailsTemplate(filmCards[0]), 'beforeend');
