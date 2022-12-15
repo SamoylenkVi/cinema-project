@@ -12,5 +12,6 @@ module.exports = {
   },
   rules: {
     'no-plusplus': [2, { allowForLoopAfterthoughts: true }],
+    'no-underscore-dangle': 'off',
   },
 };
