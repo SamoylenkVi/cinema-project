@@ -1,4 +1,3 @@
-const FILM_COUNT = 20;
-
-// eslint-disable-next-line import/prefer-default-export
-export { FILM_COUNT };
+export const FILM_COUNT = 20;
+export const TEXT_LIMIT = 140;
+export const ACTIVE_BUTTON_CLASS = 'film-card__controls-item--active';

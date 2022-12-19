@@ -1,6 +1,6 @@
 import createUserProfileTemplate from './view/user-profile';
 import SiteMenuView from './view/menu';
-import createMovieCardTemplate from './view/ movie-card';
+import FilmCardView from './view/movie-card';
 import createMovieWrapper from './view/movie-wrapper';
 import SortCardMenuView from './view/sort';
 import createShowMoreButton from './view/show-more-button';
@@ -31,7 +31,11 @@ const renderCardContainer = (classNameSection, title, cardCount, classNameContai
   render(allMovieWrapper, createMovieWrapper(classNameSection, title), 'beforeend');
   const movieWrapper = document.querySelector(classNameContainer);
   for (let i = 0; i < Math.min(cardCount, TASK_COUNT_PER_STEP); i++) {
-    render(movieWrapper, createMovieCardTemplate(filmCards[i]), 'beforeend');
+    renderElement(
+      movieWrapper,
+      new FilmCardView(filmCards[i]).getElement(),
+      RenderPosition.BEFOREEND,
+    );
   }
 };
 
@@ -51,7 +55,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     evt.preventDefault();
     filmCards
       .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
-      .forEach((filmCard) => render(movieListWrapper, createMovieCardTemplate(filmCard), 'beforeend'));
+      .forEach((filmCard) => render(movieListWrapper, new FilmCardView(filmCard).getElement(), 'beforeend'));
 
     renderedTaskCount += TASK_COUNT_PER_STEP;
 
