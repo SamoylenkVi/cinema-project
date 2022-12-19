@@ -2,7 +2,7 @@ import createUserProfileTemplate from './view/user-profile';
 import SiteMenuView from './view/menu';
 import createMovieCardTemplate from './view/ movie-card';
 import createMovieWrapper from './view/movie-wrapper';
-import createSortCardTemplate from './view/sort';
+import SortCardMenuView from './view/sort';
 import createShowMoreButton from './view/show-more-button';
 // import createFilmDetailsTemplate from './view/film-details';
 import {
@@ -22,7 +22,7 @@ const headerElement = document.querySelector('.header');
 
 render(headerElement, createUserProfileTemplate, 'beforeend');
 renderElement(mainElement, new SiteMenuView(filmCards).getElement(), RenderPosition.AFTERBEGIN);
-render(mainElement, createSortCardTemplate, 'beforeend');
+renderElement(mainElement, new SortCardMenuView().getElement(), RenderPosition.BEFOREEND);
 render(mainElement, '<section class="films"></section>', 'beforeend');
 
 const allMovieWrapper = mainElement.querySelector('.films');
