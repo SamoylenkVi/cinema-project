@@ -1,12 +1,13 @@
-import createUserProfileTemplate from './view/user-profile';
+import UserProfileView from './view/user-profile';
 import SiteMenuView from './view/menu';
+import GenericMovieWrapperView from './view/all-movie-wrapper';
 import FilmCardView from './view/movie-card';
 import MovieWrapperView from './view/movie-wrapper';
 import SortCardMenuView from './view/sort';
-import createShowMoreButton from './view/show-more-button';
+import ShowMoreButtonView from './view/show-more-button';
 // import createFilmDetailsTemplate from './view/film-details';
 import {
-  render, renderElement, RenderPosition,
+  renderElement, RenderPosition,
 } from './utils';
 import { generateCardFilm } from './mock/card-film';
 import { FILM_COUNT } from './constants';
@@ -20,10 +21,10 @@ const filmCards = new Array(FILM_COUNT)
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 
-render(headerElement, createUserProfileTemplate, 'beforeend');
+renderElement(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
 renderElement(mainElement, new SiteMenuView(filmCards).getElement(), RenderPosition.AFTERBEGIN);
 renderElement(mainElement, new SortCardMenuView().getElement(), RenderPosition.BEFOREEND);
-render(mainElement, '<section class="films"></section>', 'beforeend');
+renderElement(mainElement, new GenericMovieWrapperView().getElement(), RenderPosition.BEFOREEND);
 
 const allMovieWrapper = mainElement.querySelector('.films');
 
@@ -53,7 +54,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
   let renderedTaskCount = TASK_COUNT_PER_STEP;
 
   const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
-  render(movieWrapperMain, createShowMoreButton, 'beforeend');
+  renderElement(movieWrapperMain, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
 
   const loadMoreButton = document.querySelector('.films-list__show-more');
 

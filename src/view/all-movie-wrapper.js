@@ -1,15 +1,14 @@
 import { createElement } from '../utils';
 
-const createShowMoreButton = () => `
-<button class="films-list__show-more">Show more</button>`;
+const createMovieWrapper = () => '<section class="films"></section>';
 
-export default class ShowMoreButton {
+export default class GenericMovieWrapper {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createShowMoreButton();
+    return createMovieWrapper();
   }
 
   getElement() {
