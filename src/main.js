@@ -10,7 +10,7 @@ import {
   renderElement, RenderPosition,
 } from './utils';
 import { generateCardFilm } from './mock/card-film';
-import { FILM_COUNT } from './constants';
+import { FILM_COUNT, Keys } from './constants';
 
 const TASK_COUNT_PER_STEP = 5;
 const CARD_COUNT_EXTRA = 2;
@@ -37,21 +37,31 @@ const renderCardFilm = (wrapper, card) => {
   const cardComments = filmCard.querySelector('.film-card__comments');
   const closeButtonFilm = filmDetails.querySelector('.film-details__close-btn');
 
-  const showFilmDetailsHandler = () => {
-    mainElement.appendChild(filmDetails);
-    page.classList.add('hide-overflow');
-  };
-
   const closeFilmDetailsHandler = () => {
     mainElement.removeChild(filmDetails);
     page.classList.remove('hide-overflow');
+
+    closeButtonFilm.removeEventListener('click', closeFilmDetailsHandler);
+    // eslint-disable-next-line no-use-before-define
+    document.removeEventListener('keydown', escapeKeydownHandler);
+  };
+
+  const escapeKeydownHandler = (evt) => {
+    if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
+      closeFilmDetailsHandler();
+    }
+  };
+
+  const showFilmDetailsHandler = () => {
+    mainElement.appendChild(filmDetails);
+    page.classList.add('hide-overflow');
+    document.addEventListener('keydown', escapeKeydownHandler);
+    closeButtonFilm.addEventListener('click', closeFilmDetailsHandler);
   };
 
   filmCard.addEventListener('click', showFilmDetailsHandler);
   cardTitle.addEventListener('click', showFilmDetailsHandler);
   cardComments.addEventListener('click', showFilmDetailsHandler);
-
-  closeButtonFilm.addEventListener('click', closeFilmDetailsHandler);
 
   renderElement(wrapper, filmCard, RenderPosition.BEFOREEND);
 };
@@ -86,7 +96,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     evt.preventDefault();
     filmCards
       .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
-      .forEach((filmCard) => renderElement(movieListWrapper, new FilmCardView(filmCard).getElement(), 'beforeend'));
+      .forEach((filmCard) => renderCardFilm(movieListWrapper, filmCard));
 
     renderedTaskCount += TASK_COUNT_PER_STEP;
 
