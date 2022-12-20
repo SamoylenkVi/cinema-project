@@ -4,6 +4,7 @@ import GenericMovieWrapperView from './view/all-movie-wrapper';
 import FilmCardView from './view/movie-card';
 import MovieWrapperView from './view/movie-wrapper';
 import SortCardMenuView from './view/sort';
+import EmptyFilmMessageView from './view/message-empty-film-list';
 import ShowMoreButtonView from './view/show-more-button';
 import FilmCardDetailsView from './view/film-details';
 import {
@@ -80,7 +81,17 @@ const renderCardContainer = (classNameSection, title, cardCount, classNameContai
   }
 };
 
-renderCardContainer('films-list', 'All movies. Upcoming', FILM_COUNT, '.films-list__container');
+if (filmCards.length > 0) {
+  renderCardContainer('films-list', 'All movies. Upcoming', FILM_COUNT, '.films-list__container');
+  renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
+  renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
+} else {
+  renderElement(
+    allMovieWrapper,
+    new EmptyFilmMessageView().getElement(),
+    RenderPosition.BEFOREEND,
+  );
+}
 
 const movieListWrapper = document.querySelector('.films-list__container');
 
@@ -105,6 +116,3 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     }
   });
 }
-
-renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
-renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
