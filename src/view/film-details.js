@@ -1,4 +1,4 @@
-import { addActiveButtonClass, convertsDate } from '../utils';
+import { addActiveButtonClass, convertsDate, createElement } from '../utils';
 import allComments from '../mock/film-comments';
 
 const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
@@ -163,4 +163,25 @@ const createFilmDetailsTemplate = (movieCard) => {
   </section>`;
 };
 
-export default createFilmDetailsTemplate;
+export default class FilmCardDetails {
+  constructor(filmCard) {
+    this._filmCard = filmCard;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetailsTemplate(this._filmCard);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
