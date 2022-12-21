@@ -1,8 +1,7 @@
 import { addActiveButtonClass, convertsDate, createElement } from '../utils';
 import allComments from '../mock/film-comments';
+import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 
-const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
-const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:m';
 const ACTIVE_BUTTON_CLASS = 'film-details__control-button--active';
 
 const createGenreItem = (items) => {
