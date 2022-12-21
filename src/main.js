@@ -1,13 +1,17 @@
-import createUserProfileTemplate from './view/user-profile';
-import createMenuTemplate from './view/menu';
-import createMovieCardTemplate from './view/ movie-card';
-import createMovieWrapper from './view/movie-wrapper';
-import createSortCardTemplate from './view/sort';
-import createShowMoreButton from './view/show-more-button';
-import createFilmDetailsTemplate from './view/film-details';
-import { render } from './utils';
+import UserProfileView from './view/user-profile';
+import SiteMenuView from './view/menu';
+import GenericMovieWrapperView from './view/all-movie-wrapper';
+import FilmCardView from './view/movie-card';
+import MovieWrapperView from './view/movie-wrapper';
+import SortCardMenuView from './view/sort';
+import EmptyFilmMessageView from './view/message-empty-film-list';
+import ShowMoreButtonView from './view/show-more-button';
+import FilmCardDetailsView from './view/film-details';
+import {
+  renderElement, RenderPosition,
+} from './utils';
 import { generateCardFilm } from './mock/card-film';
-import { FILM_COUNT } from './constants';
+import { FILM_COUNT, Keys } from './constants';
 
 const TASK_COUNT_PER_STEP = 5;
 const CARD_COUNT_EXTRA = 2;
@@ -17,23 +21,77 @@ const filmCards = new Array(FILM_COUNT)
   .map((element, idElement) => generateCardFilm(idElement));
 const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
+const page = document.querySelector('body');
 
-render(headerElement, createUserProfileTemplate, 'beforeend');
-render(mainElement, createMenuTemplate(filmCards), 'beforeend');
-render(mainElement, createSortCardTemplate, 'beforeend');
-render(mainElement, '<section class="films"></section>', 'beforeend');
+renderElement(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
+renderElement(mainElement, new SiteMenuView(filmCards).getElement(), RenderPosition.AFTERBEGIN);
+renderElement(mainElement, new SortCardMenuView().getElement(), RenderPosition.BEFOREEND);
+renderElement(mainElement, new GenericMovieWrapperView().getElement(), RenderPosition.BEFOREEND);
 
 const allMovieWrapper = mainElement.querySelector('.films');
 
+const renderCardFilm = (wrapper, card) => {
+  const filmCard = new FilmCardView(card).getElement();
+  const filmDetails = new FilmCardDetailsView(card).getElement();
+
+  const cardTitle = filmCard.querySelector('.film-card__title');
+  const cardComments = filmCard.querySelector('.film-card__comments');
+  const closeButtonFilm = filmDetails.querySelector('.film-details__close-btn');
+
+  const closeFilmDetailsHandler = () => {
+    mainElement.removeChild(filmDetails);
+    page.classList.remove('hide-overflow');
+
+    closeButtonFilm.removeEventListener('click', closeFilmDetailsHandler);
+    // eslint-disable-next-line no-use-before-define
+    document.removeEventListener('keydown', escapeKeydownHandler);
+  };
+
+  const escapeKeydownHandler = (evt) => {
+    if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
+      closeFilmDetailsHandler();
+    }
+  };
+
+  const showFilmDetailsHandler = () => {
+    mainElement.appendChild(filmDetails);
+    page.classList.add('hide-overflow');
+    document.addEventListener('keydown', escapeKeydownHandler);
+    closeButtonFilm.addEventListener('click', closeFilmDetailsHandler);
+  };
+
+  filmCard.addEventListener('click', showFilmDetailsHandler);
+  cardTitle.addEventListener('click', showFilmDetailsHandler);
+  cardComments.addEventListener('click', showFilmDetailsHandler);
+
+  renderElement(wrapper, filmCard, RenderPosition.BEFOREEND);
+};
+
 const renderCardContainer = (classNameSection, title, cardCount, classNameContainer) => {
-  render(allMovieWrapper, createMovieWrapper(classNameSection, title), 'beforeend');
+  renderElement(
+    allMovieWrapper,
+    new MovieWrapperView(classNameSection, title).getElement(),
+    RenderPosition.BEFOREEND,
+  );
+
   const movieWrapper = document.querySelector(classNameContainer);
+
   for (let i = 0; i < Math.min(cardCount, TASK_COUNT_PER_STEP); i++) {
-    render(movieWrapper, createMovieCardTemplate(filmCards[i]), 'beforeend');
+    renderCardFilm(movieWrapper, filmCards[i]);
   }
 };
 
-renderCardContainer('films-list', 'All movies. Upcoming', FILM_COUNT, '.films-list__container');
+if (filmCards.length > 0) {
+  renderCardContainer('films-list', 'All movies. Upcoming', FILM_COUNT, '.films-list__container');
+  renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
+  renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
+} else {
+  renderElement(
+    allMovieWrapper,
+    new EmptyFilmMessageView().getElement(),
+    RenderPosition.BEFOREEND,
+  );
+}
 
 const movieListWrapper = document.querySelector('.films-list__container');
 
@@ -41,7 +99,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
   let renderedTaskCount = TASK_COUNT_PER_STEP;
 
   const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
-  render(movieWrapperMain, createShowMoreButton, 'beforeend');
+  renderElement(movieWrapperMain, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
 
   const loadMoreButton = document.querySelector('.films-list__show-more');
 
@@ -49,7 +107,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     evt.preventDefault();
     filmCards
       .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
-      .forEach((filmCard) => render(movieListWrapper, createMovieCardTemplate(filmCard), 'beforeend'));
+      .forEach((filmCard) => renderCardFilm(movieListWrapper, filmCard));
 
     renderedTaskCount += TASK_COUNT_PER_STEP;
 
@@ -58,8 +116,3 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     }
   });
 }
-
-renderCardContainer('films-list films-list--extra', 'Top rated', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(2) .films-list__container');
-renderCardContainer('films-list films-list--extra', 'Most commented', CARD_COUNT_EXTRA, '.films-list--extra:nth-child(3) .films-list__container');
-
-render(mainElement, createFilmDetailsTemplate(filmCards[0]), 'beforeend');

@@ -1,4 +1,5 @@
 import generateFilmFilters from '../mock/filter';
+import { createElement } from '../utils';
 
 const createFilterLink = (films) => {
   const filters = generateFilmFilters(films);
@@ -15,11 +16,33 @@ const createFilterLink = (films) => {
 };
 
 const createMenuTemplate = (filmCards) => `
-    <nav class="main-navigation">
+  <nav class="main-navigation">
       <div class="main-navigation__items">
         <a href="#all" class="main-navigation__item">All movies</a>
         ${createFilterLink(filmCards)}
       </div>
       <a href="#stats" class="main-navigation__additional main-navigation__additional--active">Stats</a>
-    </nav>`;
-export default createMenuTemplate;
+  </nav>`;
+
+export default class SiteMenu {
+  constructor(cards) {
+    this._cards = cards;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenuTemplate(this._cards);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

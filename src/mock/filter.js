@@ -5,7 +5,7 @@ const isFilmInFilterCategory = (items, filterCategory) => {
 
 const genereteFilmFilters = (filmCards) => {
   const filmFilters = {
-    watchlist: isFilmInFilterCategory(filmCards, 'isWatchlist'),
+    watchlist: isFilmInFilterCategory(filmCards, 'isWatchList'),
     history: isFilmInFilterCategory(filmCards, 'isWatched'),
     favorites: isFilmInFilterCategory(filmCards, 'isFavorite'),
   };

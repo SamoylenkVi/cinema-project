@@ -1,19 +1,39 @@
 const dayjs = require('dayjs');
 
-const getRandomInteger = (a = 0, b = 1) => {
+export const getRandomInteger = (a = 0, b = 1) => {
   const lower = Math.ceil(Math.min(a, b));
   const upper = Math.floor(Math.max(a, b));
 
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-const render = (container, template, place) => {
-  const renderingHtml = typeof template === 'function' ? template() : template;
-
-  container.insertAdjacentHTML(place, renderingHtml);
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
 };
 
-const cutText = (text, limit) => {
+export const renderElement = (container, element, place) => {
+  switch (place) {
+    case RenderPosition.AFTERBEGIN:
+      container.prepend(element);
+      break;
+    case RenderPosition.BEFOREEND:
+      container.append(element);
+      break;
+    default:
+      container.append(element);
+      break;
+  }
+};
+
+export const createElement = (template) => {
+  const newElement = document.createElement('div');
+  newElement.innerHTML = template.trim();
+
+  return newElement.firstChild;
+};
+
+export const cutText = (text, limit) => {
   let croppedText = text.trim();
   if (croppedText.length <= limit) return croppedText;
   croppedText = croppedText.slice(0, limit - 1).trimEnd();
@@ -21,14 +41,6 @@ const cutText = (text, limit) => {
   return `${croppedText}...`;
 };
 
-const addActiveButtonClass = (shouldAddClass, className) => (shouldAddClass ? className : '');
+export const addActiveButtonClass = (shouldAddClass, className) => (shouldAddClass ? className : '');
 
-const convertsDate = (date, format) => dayjs(date).format(format);
-
-export {
-  render,
-  getRandomInteger,
-  cutText,
-  addActiveButtonClass,
-  convertsDate,
-};
+export const convertsDate = (date, format) => dayjs(date).format(format);

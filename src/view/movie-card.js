@@ -1,10 +1,8 @@
-import { cutText, addActiveButtonClass } from '../utils';
+import { cutText, addActiveButtonClass, createElement } from '../utils';
 import allComments from '../mock/film-comments';
+import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
 
 const dayjs = require('dayjs');
-
-const TEXT_LIMIT = 140;
-const ACTIVE_BUTTON_CLASS = 'film-card__controls-item--active';
 
 const createMovieCardTemplate = (movieCard) => {
   const {
@@ -44,4 +42,25 @@ const createMovieCardTemplate = (movieCard) => {
   </article>`;
 };
 
-export default createMovieCardTemplate;
+export default class FilmCard {
+  constructor(filmCard) {
+    this._filmCard = filmCard;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMovieCardTemplate(this._filmCard);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
