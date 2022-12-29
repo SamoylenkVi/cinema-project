@@ -31,11 +31,9 @@ renderElement(mainElement, new GenericMovieWrapperView().getElement(), RenderPos
 const allMovieWrapper = mainElement.querySelector('.films');
 
 const renderCardFilm = (wrapper, card) => {
-  const filmCard = new FilmCardView(card).getElement();
+  const filmCard = new FilmCardView(card);
   const filmDetails = new FilmCardDetailsView(card).getElement();
 
-  const cardTitle = filmCard.querySelector('.film-card__title');
-  const cardComments = filmCard.querySelector('.film-card__comments');
   const closeButtonFilm = filmDetails.querySelector('.film-details__close-btn');
 
   const closeFilmDetailsHandler = () => {
@@ -60,11 +58,9 @@ const renderCardFilm = (wrapper, card) => {
     closeButtonFilm.addEventListener('click', closeFilmDetailsHandler);
   };
 
-  filmCard.addEventListener('click', showFilmDetailsHandler);
-  cardTitle.addEventListener('click', showFilmDetailsHandler);
-  cardComments.addEventListener('click', showFilmDetailsHandler);
+  filmCard.setClickHandler(showFilmDetailsHandler);
 
-  renderElement(wrapper, filmCard, RenderPosition.BEFOREEND);
+  renderElement(wrapper, filmCard.getElement(), RenderPosition.BEFOREEND);
 };
 
 const renderCardContainer = (classNameSection, title, cardCount, classNameContainer) => {
