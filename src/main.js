@@ -95,16 +95,15 @@ if (filmCards.length > 0) {
 
 const movieListWrapper = document.querySelector('.films-list__container');
 
+const showMoreButtonComponent = new ShowMoreButtonView();
+
 if (filmCards.length > TASK_COUNT_PER_STEP) {
   let renderedTaskCount = TASK_COUNT_PER_STEP;
 
   const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
-  renderElement(movieWrapperMain, new ShowMoreButtonView().getElement(), RenderPosition.BEFOREEND);
+  renderElement(movieWrapperMain, showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
 
-  const loadMoreButton = document.querySelector('.films-list__show-more');
-
-  loadMoreButton.addEventListener('click', (evt) => {
-    evt.preventDefault();
+  showMoreButtonComponent.setClickHandler(() => {
     filmCards
       .slice(renderedTaskCount, renderedTaskCount + TASK_COUNT_PER_STEP)
       .forEach((filmCard) => renderCardFilm(movieListWrapper, filmCard));
@@ -112,7 +111,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
     renderedTaskCount += TASK_COUNT_PER_STEP;
 
     if (filmCards.length <= renderedTaskCount) {
-      loadMoreButton.remove();
+      showMoreButtonComponent.getElement().remove();
     }
   });
 }
