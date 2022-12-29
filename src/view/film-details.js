@@ -1,5 +1,5 @@
 import AbstractView from './abstract';
-import { addActiveButtonClass, convertsDate } from '../utils';
+import { addActiveButtonClass, convertsDate } from '../utils/card';
 import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 

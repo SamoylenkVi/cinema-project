@@ -9,7 +9,7 @@ import ShowMoreButtonView from './view/show-more-button';
 import FilmCardDetailsView from './view/film-details';
 import {
   renderElement, RenderPosition,
-} from './utils';
+} from './utils/render';
 import { generateCardFilm } from './mock/card-film';
 import { FILM_COUNT, Keys } from './constants';
 
@@ -23,10 +23,10 @@ const mainElement = document.querySelector('.main');
 const headerElement = document.querySelector('.header');
 const page = document.querySelector('body');
 
-renderElement(headerElement, new UserProfileView().getElement(), RenderPosition.BEFOREEND);
-renderElement(mainElement, new SiteMenuView(filmCards).getElement(), RenderPosition.AFTERBEGIN);
-renderElement(mainElement, new SortCardMenuView().getElement(), RenderPosition.BEFOREEND);
-renderElement(mainElement, new GenericMovieWrapperView().getElement(), RenderPosition.BEFOREEND);
+renderElement(headerElement, new UserProfileView(), RenderPosition.BEFOREEND);
+renderElement(mainElement, new SiteMenuView(filmCards), RenderPosition.AFTERBEGIN);
+renderElement(mainElement, new SortCardMenuView(), RenderPosition.BEFOREEND);
+renderElement(mainElement, new GenericMovieWrapperView(), RenderPosition.BEFOREEND);
 
 const allMovieWrapper = mainElement.querySelector('.films');
 
@@ -56,13 +56,13 @@ const renderCardFilm = (wrapper, card) => {
 
   filmCard.setClickHandler(showFilmDetailsHandler);
 
-  renderElement(wrapper, filmCard.getElement(), RenderPosition.BEFOREEND);
+  renderElement(wrapper, filmCard, RenderPosition.BEFOREEND);
 };
 
 const renderCardContainer = (classNameSection, title, cardCount, classNameContainer) => {
   renderElement(
     allMovieWrapper,
-    new MovieWrapperView(classNameSection, title).getElement(),
+    new MovieWrapperView(classNameSection, title),
     RenderPosition.BEFOREEND,
   );
 
@@ -80,7 +80,7 @@ if (filmCards.length > 0) {
 } else {
   renderElement(
     allMovieWrapper,
-    new EmptyFilmMessageView().getElement(),
+    new EmptyFilmMessageView(),
     RenderPosition.BEFOREEND,
   );
 }
@@ -93,7 +93,7 @@ if (filmCards.length > TASK_COUNT_PER_STEP) {
   let renderedTaskCount = TASK_COUNT_PER_STEP;
 
   const movieWrapperMain = allMovieWrapper.querySelector('.films-list');
-  renderElement(movieWrapperMain, showMoreButtonComponent.getElement(), RenderPosition.BEFOREEND);
+  renderElement(movieWrapperMain, showMoreButtonComponent, RenderPosition.BEFOREEND);
 
   showMoreButtonComponent.setClickHandler(() => {
     filmCards

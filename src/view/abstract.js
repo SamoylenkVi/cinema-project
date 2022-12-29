@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import { createElement } from '../utils/card';
 
 export default class Abstract {
   constructor() {

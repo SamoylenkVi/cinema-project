@@ -1,5 +1,5 @@
 import AbstractView from './abstract';
-import { cutText, addActiveButtonClass } from '../utils';
+import { addActiveButtonClass, cutText } from '../utils/card';
 import allComments from '../mock/film-comments';
 import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
 
