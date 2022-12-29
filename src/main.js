@@ -32,30 +32,26 @@ const allMovieWrapper = mainElement.querySelector('.films');
 
 const renderCardFilm = (wrapper, card) => {
   const filmCard = new FilmCardView(card);
-  const filmDetails = new FilmCardDetailsView(card).getElement();
-
-  const closeButtonFilm = filmDetails.querySelector('.film-details__close-btn');
+  const filmDetails = new FilmCardDetailsView(card);
 
   const closeFilmDetailsHandler = () => {
-    mainElement.removeChild(filmDetails);
+    mainElement.removeChild(filmDetails.getElement());
     page.classList.remove('hide-overflow');
-
-    closeButtonFilm.removeEventListener('click', closeFilmDetailsHandler);
-    // eslint-disable-next-line no-use-before-define
-    document.removeEventListener('keydown', escapeKeydownHandler);
+    filmDetails.removeClickHandler();
   };
 
   const escapeKeydownHandler = (evt) => {
     if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
       closeFilmDetailsHandler();
     }
+    document.removeEventListener('keydown', escapeKeydownHandler);
   };
 
   const showFilmDetailsHandler = () => {
-    mainElement.appendChild(filmDetails);
+    mainElement.appendChild(filmDetails.getElement());
     page.classList.add('hide-overflow');
     document.addEventListener('keydown', escapeKeydownHandler);
-    closeButtonFilm.addEventListener('click', closeFilmDetailsHandler);
+    filmDetails.setClickHandler(closeFilmDetailsHandler);
   };
 
   filmCard.setClickHandler(showFilmDetailsHandler);
