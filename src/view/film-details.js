@@ -1,4 +1,5 @@
-import { addActiveButtonClass, convertsDate, createElement } from '../utils';
+import AbstractView from './abstract';
+import { addActiveButtonClass, convertsDate } from '../utils';
 import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 
@@ -162,25 +163,14 @@ const createFilmDetailsTemplate = (movieCard) => {
   </section>`;
 };
 
-export default class FilmCardDetails {
+export default class FilmCardDetails extends AbstractView {
   constructor(filmCard) {
+    super();
+
     this._filmCard = filmCard;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._filmCard);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

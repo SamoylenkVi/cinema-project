@@ -1,4 +1,5 @@
-import { cutText, addActiveButtonClass, createElement } from '../utils';
+import AbstractView from './abstract';
+import { cutText, addActiveButtonClass } from '../utils';
 import allComments from '../mock/film-comments';
 import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
 
@@ -42,25 +43,14 @@ const createMovieCardTemplate = (movieCard) => {
   </article>`;
 };
 
-export default class FilmCard {
+export default class FilmCard extends AbstractView {
   constructor(filmCard) {
+    super();
+
     this._filmCard = filmCard;
-    this._element = null;
   }
 
   getTemplate() {
     return createMovieCardTemplate(this._filmCard);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

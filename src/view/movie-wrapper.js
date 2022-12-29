@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const createMovieWrapper = (className, title) => `
 <section class="${className}">
@@ -6,26 +6,15 @@ const createMovieWrapper = (className, title) => `
 
   <div class="films-list__container"></div>
 </section>`;
-export default class MovieWrapper {
+export default class MovieWrapper extends AbstractView {
   constructor(className, title) {
+    super();
+
     this._className = className;
     this._title = title;
-    this._element = null;
   }
 
   getTemplate() {
     return createMovieWrapper(this._className, this._title);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
