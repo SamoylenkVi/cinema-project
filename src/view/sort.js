@@ -1,4 +1,4 @@
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const createSortCardTemplate = () => `
 <ul class="sort">
@@ -7,23 +7,8 @@ const createSortCardTemplate = () => `
 <li><a href="#" class="sort__button">Sort by rating</a></li>
 </ul>`;
 
-export default class SortCardMenu {
-  constructor() {
-    this._element = null;
-  }
-
+export default class SortCardMenu extends AbstractView {
   getTemplate() {
     return createSortCardTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
