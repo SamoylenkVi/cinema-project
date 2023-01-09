@@ -1,4 +1,5 @@
-import { addActiveButtonClass, convertsDate, createElement } from '../utils';
+import AbstractView from './abstract';
+import { addActiveButtonClass, convertsDate } from '../utils/card';
 import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 
@@ -162,25 +163,31 @@ const createFilmDetailsTemplate = (movieCard) => {
   </section>`;
 };
 
-export default class FilmCardDetails {
+export default class FilmCardDetails extends AbstractView {
   constructor(filmCard) {
+    super();
+
     this._filmCard = filmCard;
-    this._element = null;
+    this._clickHandler = this._clickHandler.bind(this);
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._filmCard);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  _clickHandler(evt) {
+    evt.preventDefault();
 
-    return this._element;
+    this._callback.click();
   }
 
-  removeElement() {
-    this._element = null;
+  setClickHandler(callback) {
+    this._callback.click = callback;
+
+    this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
+  }
+
+  removeClickHandler() {
+    this.getElement().querySelector('.film-details__close-btn').removeEventListener('click', this._clickHandler);
   }
 }

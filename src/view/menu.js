@@ -1,5 +1,5 @@
 import generateFilmFilters from '../mock/filter';
-import { createElement } from '../utils';
+import AbstractView from './abstract';
 
 const createFilterLink = (films) => {
   const filters = generateFilmFilters(films);
@@ -24,25 +24,14 @@ const createMenuTemplate = (filmCards) => `
       <a href="#stats" class="main-navigation__additional main-navigation__additional--active">Stats</a>
   </nav>`;
 
-export default class SiteMenu {
+export default class SiteMenu extends AbstractView {
   constructor(cards) {
+    super();
+
     this._cards = cards;
-    this._element = null;
   }
 
   getTemplate() {
     return createMenuTemplate(this._cards);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
