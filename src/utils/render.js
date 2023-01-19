@@ -29,3 +29,13 @@ export const renderElement = (container, element, place) => {
       break;
   }
 };
+
+export const remove = (element) => {
+  let elementToRemove = element;
+
+  if (elementToRemove instanceof Abstract) {
+    elementToRemove = elementToRemove.getElement();
+  }
+
+  elementToRemove.remove();
+};
