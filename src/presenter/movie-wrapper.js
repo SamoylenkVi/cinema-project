@@ -16,8 +16,10 @@ export default class MovieList {
     this._filmContainer = filmContainer;
     this._emptyFilmMessage = new EmptyFilmMessageView();
     this._showMoreButton = new ShowMoreButtonView();
+
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleFilmUpdate = this._handleFilmUpdate.bind(this);
+    this._handleModeChange = this._handleModeChange.bind(this);
 
     this._movieWrapper = new MovieWrapperView(
       classNameSection,
@@ -50,10 +52,17 @@ export default class MovieList {
     this._filmsPresenter[updateFilm.id].init(updateFilm);
   }
 
+  _handleModeChange() {
+    Object
+      .values(this._filmsPresenter)
+      .forEach((presenter) => presenter.resetView());
+  }
+
   _renderCardFilm(film) {
     const filmPresenter = new MovieCardPresenter(
       this._movieWrapperList,
       this._handleFilmUpdate,
+      this._handleModeChange,
     );
 
     filmPresenter.init(film);

@@ -6,15 +6,22 @@ import {
   renderElement, RenderPosition,
 } from '../utils/render';
 
+const Mode = {
+  DEFAULT: 'DEFAULT',
+  POPUP: 'POPUP',
+};
 export default class MovieCard {
-  constructor(wrapper, changeData) {
+  constructor(wrapper, changeData, modeChange) {
     this.wrapperCard = wrapper;
     this.changeData = changeData;
+    this.changeMode = modeChange;
+
     this.filmDetailsWrapper = document.querySelector('.main');
     this._page = document.querySelector('body');
 
     this._filmCard = null;
     this._filmCardDetails = null;
+    this._mode = Mode.DEFAULT;
 
     this._showFilmDetailsHandler = this._showFilmDetailsHandler.bind(this);
     this._closeFilmDetailsHandler = this._closeFilmDetailsHandler.bind(this);
@@ -55,21 +62,20 @@ export default class MovieCard {
     remove(prevFilmCardDetails);
   }
 
-  destroy() {
-    remove(this._filmCard);
-    remove(this._filmCardDetails);
-  }
-
   _showFilmDetailsHandler() {
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
     this._page.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escapeKeydownHandler);
+    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
+    this.changeMode();
+    this._mode = Mode.POPUP;
   }
 
   _closeFilmDetailsHandler() {
     this.filmDetailsWrapper.removeChild(this._filmCardDetails.getElement());
     this._page.classList.remove('hide-overflow');
     this._filmCardDetails.removeClickHandler();
+    this._mode = Mode.DEFAULT;
   }
 
   _escapeKeydownHandler(evt) {
@@ -77,6 +83,13 @@ export default class MovieCard {
       this._closeFilmDetailsHandler();
     }
     document.removeEventListener('keydown', this._escapeKeydownHandler);
+    this._mode = Mode.DEFAULT;
+  }
+
+  resetView() {
+    if (this._mode !== Mode.DEFAULT) {
+      this._closeFilmDetailsHandler();
+    }
   }
 
   _addFilmToSpecialList({
@@ -108,5 +121,10 @@ export default class MovieCard {
         },
       );
     }
+  }
+
+  destroy() {
+    remove(this._filmCard);
+    remove(this._filmCardDetails);
   }
 }
