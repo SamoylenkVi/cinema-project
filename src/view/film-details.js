@@ -114,9 +114,9 @@ const createFilmDetailsTemplate = (movieCard) => {
         </div>
 
         <section class="film-details__controls">
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" id="watchlist" name="watchlist">Add to watchlist</button>
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--active film-details__control-button--watched" id="watched" name="watched">Already watched</button>
-          <button type="button" class="film-details__control-button ${addActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" id="favorite" name="favorite">Add to favorites</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-details__control-button--watchlist" data-watchlist id="watchlist" name="watchlist">Add to watchlist</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-details__control-button--watched" data-watched id="watched" name="watched">Already watched</button>
+          <button type="button" class="film-details__control-button ${addActiveButtonClass(isFavorite, ACTIVE_BUTTON_CLASS)} film-details__control-button--favorite" data-favorite id="favorite" name="favorite">Add to favorites</button>
         </section>
       </div>
 
@@ -169,6 +169,7 @@ export default class FilmCardDetails extends AbstractView {
 
     this._filmCard = filmCard;
     this._clickHandler = this._clickHandler.bind(this);
+    this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
   }
 
   getTemplate() {
@@ -189,5 +190,31 @@ export default class FilmCardDetails extends AbstractView {
 
   removeClickHandler() {
     this.getElement().querySelector('.film-details__close-btn').removeEventListener('click', this._clickHandler);
+  }
+
+  _addToSpecialListHandler(evt) {
+    evt.preventDefault();
+    this._callback.specialList({
+      isAddedToWatchList: evt.target.hasAttribute('data-watchlist'),
+      isAddedToWatched: evt.target.hasAttribute('data-watched'),
+      isAddedToFavorite: evt.target.hasAttribute('data-favorite'),
+    });
+  }
+
+  setSpecialListHandler(callback) {
+    this._callback.specialList = callback;
+
+    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener(
+      'click',
+      this._addToSpecialListHandler,
+    );
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener(
+      'click',
+      this._addToSpecialListHandler,
+    );
+    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener(
+      'click',
+      this._addToSpecialListHandler,
+    );
   }
 }

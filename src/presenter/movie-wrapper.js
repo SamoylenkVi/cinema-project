@@ -7,6 +7,8 @@ import {
   renderElement, RenderPosition, remove,
 } from '../utils/render';
 
+import { updateItem } from '../utils/common';
+
 const TASK_COUNT_PER_STEP = 5;
 
 export default class MovieList {
@@ -15,6 +17,7 @@ export default class MovieList {
     this._emptyFilmMessage = new EmptyFilmMessageView();
     this._showMoreButton = new ShowMoreButtonView();
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
+    this._handleFilmUpdate = this._handleFilmUpdate.bind(this);
 
     this._movieWrapper = new MovieWrapperView(
       classNameSection,
@@ -22,13 +25,13 @@ export default class MovieList {
       containerListAttribute,
     );
 
+    this._filmsPresenter = {};
     this._movieWrapperList = null;
     this._renderedTaskCount = TASK_COUNT_PER_STEP;
   }
 
   init(filmCards) {
     this._filmCards = filmCards.slice();
-
     this._renderFilmsContainer();
 
     if (filmCards.length > 0) {
@@ -42,14 +45,19 @@ export default class MovieList {
     }
   }
 
+  _handleFilmUpdate(updateFilm) {
+    this._filmCards = updateItem(this._filmCards, updateFilm);
+    this._filmsPresenter[updateFilm.id].init(updateFilm);
+  }
+
   _renderCardFilm(film) {
     const filmPresenter = new MovieCardPresenter(
       this._movieWrapperList,
-      this._mainElement,
-      this._page,
+      this._handleFilmUpdate,
     );
 
     filmPresenter.init(film);
+    this._filmsPresenter[film.id] = filmPresenter;
   }
 
   _renderCardsFilm(from, to) {
@@ -81,5 +89,15 @@ export default class MovieList {
   _renderFilmsContainer() {
     renderElement(this._filmContainer, this._movieWrapper, RenderPosition.BEFOREEND);
     this._movieWrapperList = this._movieWrapper.getFilmsListContainer();
+  }
+
+  _clearFilmsList() {
+    Object
+      .values(this._filmsPresenter)
+      .forEach((film) => film.destroy());
+
+    this._renderedTaskCount = TASK_COUNT_PER_STEP;
+    this._filmsPresenter = {};
+    remove(this._showMoreButton);
   }
 }

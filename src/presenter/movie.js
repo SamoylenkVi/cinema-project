@@ -2,12 +2,14 @@ import FilmCardView from '../view/movie-card';
 import FilmCardDetailsView from '../view/film-details';
 import { Keys } from '../constants';
 import {
+  remove,
   renderElement, RenderPosition,
 } from '../utils/render';
 
 export default class MovieCard {
-  constructor(wrapper) {
+  constructor(wrapper, changeData) {
     this.wrapperCard = wrapper;
+    this.changeData = changeData;
     this.filmDetailsWrapper = document.querySelector('.main');
     this._page = document.querySelector('body');
 
@@ -17,26 +19,55 @@ export default class MovieCard {
     this._showFilmDetailsHandler = this._showFilmDetailsHandler.bind(this);
     this._closeFilmDetailsHandler = this._closeFilmDetailsHandler.bind(this);
     this._escapeKeydownHandler = this._escapeKeydownHandler.bind(this);
+    this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
 
   init(filmCard) {
-    this.filmCard = new FilmCardView(filmCard);
-    this.FilmCardDetails = new FilmCardDetailsView(filmCard);
+    this._filmCardData = filmCard;
 
-    this.filmCard.setClickHandler(this._showFilmDetailsHandler);
+    const prevFilmCard = this._filmCard;
+    const prevFilmCardDetails = this._filmCardDetails;
 
-    renderElement(this.wrapperCard, this.filmCard, RenderPosition.BEFOREEND);
+    this._filmCard = new FilmCardView(this._filmCardData);
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+
+    this._filmCard.setOpenPopupHandler(this._showFilmDetailsHandler);
+    this._filmCard.setSpecialListHandler(this._addFilmToSpecialList);
+    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
+    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
+
+    if (prevFilmCard === null || prevFilmCardDetails === null) {
+      renderElement(this.wrapperCard, this._filmCard, RenderPosition.BEFOREEND);
+      return;
+    }
+
+    if (this.wrapperCard.contains(prevFilmCard.getElement())) {
+      this.wrapperCard.replaceChild(this._filmCard.getElement(), prevFilmCard.getElement());
+    }
+
+    if (this.filmDetailsWrapper.contains(prevFilmCardDetails.getElement())) {
+      this.filmDetailsWrapper.replaceChild(
+        this._filmCardDetails.getElement(),
+        prevFilmCardDetails.getElement(),
+      );
+    }
+    remove(prevFilmCard);
+    remove(prevFilmCardDetails);
+  }
+
+  destroy() {
+    remove(this._filmCard);
+    remove(this._filmCardDetails);
   }
 
   _showFilmDetailsHandler() {
-    this.filmDetailsWrapper.appendChild(this.FilmCardDetails.getElement());
+    this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
     this._page.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escapeKeydownHandler);
-    this.FilmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
   }
 
   _closeFilmDetailsHandler() {
-    this.filmDetailsWrapper.removeChild(this.FilmCardDetails.getElement());
+    this.filmDetailsWrapper.removeChild(this._filmCardDetails.getElement());
     this._page.classList.remove('hide-overflow');
     this._filmCardDetails.removeClickHandler();
   }
@@ -46,5 +77,36 @@ export default class MovieCard {
       this._closeFilmDetailsHandler();
     }
     document.removeEventListener('keydown', this._escapeKeydownHandler);
+  }
+
+  _addFilmToSpecialList({
+    isAddedToWatchList,
+    isAddedToWatched,
+    isAddedToFavorite,
+  }) {
+    if (isAddedToWatchList) {
+      this.changeData(
+        this._filmCardData = {
+          ...this._filmCardData,
+          isWatchList: !this._filmCardData.isWatchList,
+        },
+      );
+    }
+    if (isAddedToWatched) {
+      this.changeData(
+        this._filmCardData = {
+          ...this._filmCardData,
+          isWatched: !this._filmCardData.isWatched,
+        },
+      );
+    }
+    if (isAddedToFavorite) {
+      this.changeData(
+        this._filmCardData = {
+          ...this._filmCardData,
+          isFavorite: !this._filmCardData.isFavorite,
+        },
+      );
+    }
   }
 }
