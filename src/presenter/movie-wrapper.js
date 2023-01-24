@@ -33,18 +33,14 @@ export default class MovieList {
   }
 
   init(filmCards) {
-    this._filmCards = filmCards.slice();
     this._renderFilmsContainer();
 
-    if (filmCards.length > 0) {
-      this._renderCardsFilm(0, this._renderedTaskCount);
-    } else {
-      this._renderNoFilmsMessage();
-    }
+    this._renderFilmsList(filmCards);
+  }
 
-    if (filmCards.length > TASK_COUNT_PER_STEP) {
-      this._renderLoadMoreButton();
-    }
+  sortFilms(films) {
+    this._clearFilmsList();
+    this._renderFilmsList(films);
   }
 
   _handleFilmUpdate(updateFilm) {
@@ -56,6 +52,20 @@ export default class MovieList {
     Object
       .values(this._filmsPresenter)
       .forEach((presenter) => presenter.resetView());
+  }
+
+  _renderFilmsList(films) {
+    this._filmCards = films;
+
+    if (films.length > 0) {
+      this._renderCardsFilm(0, this._renderedTaskCount);
+    } else {
+      this._renderNoFilmsMessage();
+    }
+
+    if (films.length > this._renderedTaskCount) {
+      this._renderLoadMoreButton();
+    }
   }
 
   _renderCardFilm(film) {
@@ -104,9 +114,6 @@ export default class MovieList {
     Object
       .values(this._filmsPresenter)
       .forEach((film) => film.destroy());
-
-    this._renderedTaskCount = TASK_COUNT_PER_STEP;
     this._filmsPresenter = {};
-    remove(this._showMoreButton);
   }
 }

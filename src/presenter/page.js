@@ -30,16 +30,40 @@ export default class Page {
     this._sortCardMenu = new SortCardMenuView();
 
     this._handleSortMovieCard = this._handleSortMovieCard.bind(this);
+
+    this._filmsCardsDefault = null;
   }
 
   init(filmsCards) {
+    this._filmsCardsDefault = filmsCards;
+    this._filmsCard = filmsCards.slice();
+
     this._renderSortFilms();
     this._renderAllMovieWrapper();
-    this._moviePresenter.init(filmsCards);
+    this._moviePresenter.init(this._filmsCard);
   }
 
-  _handleSortMovieCard() {
+  _handleSortMovieCard({
+    isSortDefault,
+    isSortDate,
+    isSortRating,
+  }) {
+    if (isSortDefault) {
+      const cardsByDefault = this._filmsCardsDefault.slice();
+      this._moviePresenter.sortFilms(cardsByDefault);
+    }
 
+    if (isSortDate) {
+      this._filmsCard.sort((a, b) => b.productionYear - a.productionYear);
+
+      this._moviePresenter.sortFilms(this._filmsCard);
+    }
+
+    if (isSortRating) {
+      this._filmsCard.sort((a, b) => b.rating - a.rating);
+
+      this._moviePresenter.sortFilms(this._filmsCard);
+    }
   }
 
   _renderSortFilms() {
