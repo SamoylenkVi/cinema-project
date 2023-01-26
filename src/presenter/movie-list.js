@@ -35,17 +35,17 @@ export default class MovieList {
   init(filmCards) {
     this._renderFilmsContainer();
 
-    this._renderFilmsList(filmCards);
+    this._renderFilmList(filmCards);
   }
 
   sortFilms(films) {
-    this._clearFilmsList();
-    this._renderFilmsList(films);
+    this._clearFilmList();
+    this._renderFilmList(films);
   }
 
-  _handleFilmUpdate(updateFilm) {
-    this._filmCards = updateItem(this._filmCards, updateFilm);
-    this._filmsPresenter[updateFilm.id].init(updateFilm);
+  _handleFilmUpdate(updatedFilm) {
+    this._filmCards = updateItem(this._filmCards, updatedFilm);
+    this._filmsPresenter[updatedFilm.id].init(updatedFilm);
   }
 
   _handleModeChange() {
@@ -54,11 +54,11 @@ export default class MovieList {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _renderFilmsList(films) {
+  _renderFilmList(films) {
     this._filmCards = films;
 
     if (films.length > 0) {
-      this._renderCardsFilm(0, this._renderedTaskCount);
+      this._renderFilmCards(0, this._renderedTaskCount);
     } else {
       this._renderNoFilmsMessage();
     }
@@ -68,7 +68,7 @@ export default class MovieList {
     }
   }
 
-  _renderCardFilm(film) {
+  _renderFilmCard(film) {
     const filmPresenter = new MovieCardPresenter(
       this._movieWrapperList,
       this._handleFilmUpdate,
@@ -79,10 +79,10 @@ export default class MovieList {
     this._filmsPresenter[film.id] = filmPresenter;
   }
 
-  _renderCardsFilm(from, to) {
+  _renderFilmCards(from, to) {
     this._filmCards
       .slice(from, to)
-      .forEach((film) => this._renderCardFilm(film));
+      .forEach((film) => this._renderFilmCard(film));
   }
 
   _renderNoFilmsMessage() {
@@ -90,7 +90,7 @@ export default class MovieList {
   }
 
   _handleLoadMoreButtonClick() {
-    this._renderCardsFilm(this._renderedTaskCount, this._renderedTaskCount + TASK_COUNT_PER_STEP);
+    this._renderFilmCards(this._renderedTaskCount, this._renderedTaskCount + TASK_COUNT_PER_STEP);
 
     this._renderedTaskCount += TASK_COUNT_PER_STEP;
 
@@ -110,7 +110,7 @@ export default class MovieList {
     this._movieWrapperList = this._movieWrapper.getFilmsListContainer();
   }
 
-  _clearFilmsList() {
+  _clearFilmList() {
     Object
       .values(this._filmsPresenter)
       .forEach((film) => film.destroy());

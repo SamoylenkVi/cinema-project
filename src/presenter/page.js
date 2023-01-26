@@ -1,6 +1,6 @@
 import SortCardMenuView from '../view/sort';
 import GenericMovieWrapperView from '../view/all-movie-wrapper';
-import MovieListPresenter from './movie-wrapper';
+import MovieListPresenter from './movie-list';
 
 import {
   renderElement, RenderPosition,
