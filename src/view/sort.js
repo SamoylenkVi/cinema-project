@@ -35,14 +35,6 @@ export default class SortCardMenu extends AbstractView {
   setSortMovieHandler(callback) {
     this._callback.sortMovie = callback;
 
-    this.getElement().querySelector('[data-sort-default]').addEventListener(
-      'click',
-      this._addSortMovieHandler,
-    );
-    this.getElement().querySelector('[data-sort-date]').addEventListener('click', this._addSortMovieHandler);
-    this.getElement().querySelector('[data-sort-rating]').addEventListener(
-      'click',
-      this._addSortMovieHandler,
-    );
+    this.getElement().addEventListener('click', this._addSortMovieHandler);
   }
 }

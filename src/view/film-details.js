@@ -204,15 +204,7 @@ export default class FilmCardDetails extends AbstractView {
   setSpecialListHandler(callback) {
     this._callback.specialList = callback;
 
-    this.getElement().querySelector('.film-details__control-button--watchlist').addEventListener(
-      'click',
-      this._addToSpecialListHandler,
-    );
-    this.getElement().querySelector('.film-details__control-button--watched').addEventListener(
-      'click',
-      this._addToSpecialListHandler,
-    );
-    this.getElement().querySelector('.film-details__control-button--favorite').addEventListener(
+    this.getElement().querySelector('.film-details__controls').addEventListener(
       'click',
       this._addToSpecialListHandler,
     );
