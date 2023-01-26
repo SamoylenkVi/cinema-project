@@ -1,9 +1,9 @@
 import FilmCardView from '../view/movie-card';
 import FilmCardDetailsView from '../view/film-details';
-import { Keys } from '../constants';
+import { Keys, RenderPosition } from '../constants';
 import {
   remove,
-  renderElement, RenderPosition,
+  renderElement,
 } from '../utils/render';
 
 const Mode = {

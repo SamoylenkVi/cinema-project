@@ -1,11 +1,9 @@
 import UserProfileView from './view/user-profile';
 import SiteMenuView from './view/menu';
 import PagePresenter from './presenter/page';
-import {
-  renderElement, RenderPosition,
-} from './utils/render';
+import { renderElement } from './utils/render';
 import { generateCardFilm } from './mock/card-film';
-import { FILM_COUNT } from './constants';
+import { FILM_COUNT, RenderPosition } from './constants';
 
 const filmCards = new Array(FILM_COUNT)
   .fill()

@@ -1,10 +1,9 @@
 import SortCardMenuView from '../view/sort';
 import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
+import { RenderPosition } from '../constants';
 
-import {
-  renderElement, RenderPosition,
-} from '../utils/render';
+import { renderElement } from '../utils/render';
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
 const MAIN_FILMS_WRAPPER = 'films-list';

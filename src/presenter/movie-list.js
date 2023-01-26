@@ -2,9 +2,10 @@ import EmptyFilmMessageView from '../view/message-empty-film-list';
 import ShowMoreButtonView from '../view/show-more-button';
 import MovieWrapperView from '../view/movie-wrapper';
 import MovieCardPresenter from './movie';
+import { RenderPosition } from '../constants';
 
 import {
-  renderElement, RenderPosition, remove,
+  renderElement, remove,
 } from '../utils/render';
 
 import { updateItem } from '../utils/common';

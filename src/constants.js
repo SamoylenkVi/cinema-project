@@ -7,3 +7,7 @@ export const Keys = {
   ESCAPE: 'Escape',
   ESC: 'Esc',
 };
+export const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+};
