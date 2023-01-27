@@ -1,4 +1,4 @@
-import getRandomInteger from '../utils/common';
+import { getRandomInteger } from '../utils/common';
 import { getRandomItem } from './card-film';
 
 import { FILM_COUNT } from '../constants';

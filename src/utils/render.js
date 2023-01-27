@@ -1,9 +1,5 @@
 import Abstract from '../view/abstract';
-
-export const RenderPosition = {
-  AFTERBEGIN: 'afterbegin',
-  BEFOREEND: 'beforeend',
-};
+import { RenderPosition } from '../constants';
 
 export const renderElement = (container, element, place) => {
   let containerElement = container;
@@ -28,4 +24,14 @@ export const renderElement = (container, element, place) => {
       containerElement.append(child);
       break;
   }
+};
+
+export const remove = (element) => {
+  let elementToRemove = element;
+
+  if (elementToRemove instanceof Abstract) {
+    elementToRemove = elementToRemove.getElement();
+  }
+
+  elementToRemove.remove();
 };

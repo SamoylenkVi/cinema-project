@@ -1,4 +1,4 @@
-import getRandomInteger from '../utils/common';
+import { getRandomInteger } from '../utils/common';
 
 const POSTERS_URL = './images/posters/';
 
