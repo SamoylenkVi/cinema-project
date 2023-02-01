@@ -1,7 +1,7 @@
-import AbstractView from './abstract';
 import { addActiveButtonClass, convertsDate } from '../utils/card';
 import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
+import Smart from './smart';
 
 const ACTIVE_BUTTON_CLASS = 'film-details__control-button--active';
 
@@ -50,6 +50,9 @@ const createFilmDetailsTemplate = (movieCard) => {
     isFavorite,
     genre,
     ageRating,
+    isEmotion,
+    selectedEmotion,
+    commentText,
   } = movieCard;
 
   const cardComments = allComments[id];
@@ -129,10 +132,13 @@ const createFilmDetailsTemplate = (movieCard) => {
           </ul>
 
           <div class="film-details__new-comment">
-            <div class="film-details__add-emoji-label"></div>
+            <div class="film-details__add-emoji-label">
+            ${isEmotion ? `<img src="./images/emoji/${selectedEmotion}.png" width="55" height="55" alt="emoji-${selectedEmotion}">` : ''}
+
+            </div>
 
             <label class="film-details__comment-label">
-              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment"></textarea>
+              <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${commentText}</textarea>
             </label>
 
             <div class="film-details__emoji-list">
@@ -163,17 +169,67 @@ const createFilmDetailsTemplate = (movieCard) => {
   </section>`;
 };
 
-export default class FilmCardDetails extends AbstractView {
+export default class FilmCardDetails extends Smart {
   constructor(filmCard) {
     super();
 
-    this._filmCard = filmCard;
+    this._filmCardState = FilmCardDetails.parseTaskToState(filmCard);
     this._clickHandler = this._clickHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
+    this._selectEmojiHandler = this._selectEmojiHandler.bind(this);
+    this._commentInputHandler = this._commentInputHandler.bind(this);
+
+    this._formImage = this.getElement().querySelector('.film-details__add-emoji-label img');
+    this._setInnerHandlers();
+  }
+
+  static parseTaskToState(filmCard) {
+    const filmState = {
+      ...filmCard,
+      isEmotion: false,
+      selectedEmotion: '',
+      commentText: '',
+    };
+    return filmState;
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._filmCard);
+    return createFilmDetailsTemplate(this._filmCardState);
+  }
+
+  _setInnerHandlers() {
+    this.getElement()
+      .querySelectorAll('.film-details__emoji-item')
+      .forEach((element) => {
+        element.addEventListener('click', this._selectEmojiHandler);
+      });
+
+    this.getElement()
+      .querySelector('.film-details__comment-input')
+      .addEventListener('input', this._commentInputHandler);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSpecialListHandler(this._callback.specialList);
+    this.setClickHandler(this._callback.click);
+  }
+
+  _commentInputHandler(evt) {
+    evt.preventDefault();
+    this.updateData({
+      commentText: evt.target.value,
+    }, true);
+  }
+
+  _selectEmojiHandler(evt) {
+    evt.preventDefault();
+    if (evt.target.hasAttribute('value')) {
+      this.updateData({
+        isEmotion: true,
+        selectedEmotion: evt.target.value,
+      });
+    }
   }
 
   _clickHandler(evt) {
