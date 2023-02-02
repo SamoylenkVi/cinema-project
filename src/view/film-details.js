@@ -173,17 +173,20 @@ export default class FilmCardDetails extends Smart {
   constructor(filmCard) {
     super();
 
-    this._filmCardState = FilmCardDetails.parseTaskToState(filmCard);
+    this._filmCardState = FilmCardDetails.parseDataToState(filmCard);
+
     this._clickHandler = this._clickHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
     this._selectEmojiHandler = this._selectEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
 
     this._formImage = this.getElement().querySelector('.film-details__add-emoji-label img');
+    this._favoriteButtonWrapper = this.getElement().querySelector('.film-details__controls');
+
     this._setInnerHandlers();
   }
 
-  static parseTaskToState(filmCard) {
+  static parseDataToState(filmCard) {
     const filmState = {
       ...filmCard,
       isEmotion: false,
@@ -193,8 +196,29 @@ export default class FilmCardDetails extends Smart {
     return filmState;
   }
 
+  static parseStateToData(state) {
+    const filmData = {
+      ...state,
+    };
+    delete filmData.isEmotion;
+    delete filmData.selectedEmotion;
+    delete filmData.commentText;
+
+    return filmData;
+  }
+
+  reset(filmCard) {
+    this.updateData(
+      FilmCardDetails.parseDataToState(filmCard),
+    );
+  }
+
   getTemplate() {
     return createFilmDetailsTemplate(this._filmCardState);
+  }
+
+  scrollToFavoriteButton() {
+    this._favoriteButtonWrapper.scrollIntoView({ block: 'center' });
   }
 
   _setInnerHandlers() {
