@@ -1,9 +1,7 @@
 import AbstractView from './abstract';
-import { addActiveButtonClass, cutText } from '../utils/card';
+import { addActiveButtonClass, cutText, convertsDate } from '../utils/card';
 import allComments from '../mock/film-comments';
-import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
-
-const dayjs = require('dayjs');
+import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS, MOVIE_CARD_YEAR_FORMAT } from '../constants';
 
 const createMovieCardTemplate = (movieCard) => {
   const {
@@ -28,7 +26,7 @@ const createMovieCardTemplate = (movieCard) => {
   <h3 class="film-card__title">${name}</h3>
   <p class="film-card__rating">${rating}</p>
   <p class="film-card__info">
-    <span class="film-card__year">${dayjs(productionYear).format('YYYY')}</span>
+    <span class="film-card__year">${convertsDate(productionYear, MOVIE_CARD_YEAR_FORMAT)}</span>
     <span class="film-card__duration">${filmDuration}</span>
     <span class="film-card__genre">${genre[0]}</span>
   </p>
