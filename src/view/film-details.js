@@ -133,7 +133,7 @@ const createFilmDetailsTemplate = (movieCard) => {
 
           <div class="film-details__new-comment">
             <div class="film-details__add-emoji-label">
-            ${isEmotion ? `<img src="./images/emoji/${selectedEmotion}.png" width="55" height="55" alt="emoji-${selectedEmotion}">` : ''}
+            ${isEmotion ? `<img src="./images/emoji/${selectedEmotion}.png" width="55" height="55" alt="emoji ${selectedEmotion}">` : ''}
 
             </div>
 

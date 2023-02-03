@@ -18,7 +18,7 @@ export default class Smart extends Abstract {
     newElement.scrollTo(0, newElement.scrollHeight);
   }
 
-  updateData(update, justUpdateElement) {
+  updateData(update, justUpdateState) {
     if (!update) {
       return;
     }
@@ -28,7 +28,7 @@ export default class Smart extends Abstract {
       ...update,
     };
 
-    if (justUpdateElement) {
+    if (justUpdateState) {
       return;
     }
 
