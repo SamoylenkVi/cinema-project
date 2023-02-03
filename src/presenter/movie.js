@@ -72,18 +72,19 @@ export default class MovieCard {
   }
 
   _closeFilmDetailsHandler() {
+    this._filmCardDetails.reset(this._filmCardData);
     this.filmDetailsWrapper.removeChild(this._filmCardDetails.getElement());
     this._page.classList.remove('hide-overflow');
     this._filmCardDetails.removeClickHandler();
+
     this._mode = Mode.DEFAULT;
   }
 
   _escapeKeydownHandler(evt) {
     if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
       this._closeFilmDetailsHandler();
+      document.removeEventListener('keydown', this._escapeKeydownHandler);
     }
-    document.removeEventListener('keydown', this._escapeKeydownHandler);
-    this._mode = Mode.DEFAULT;
   }
 
   resetView() {
@@ -121,6 +122,8 @@ export default class MovieCard {
         },
       );
     }
+
+    this._filmCardDetails.scrollToFavoriteButton();
   }
 
   destroy() {
