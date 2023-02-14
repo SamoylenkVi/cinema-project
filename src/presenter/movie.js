@@ -1,6 +1,12 @@
 import FilmCardView from '../view/movie-card';
 import FilmCardDetailsView from '../view/film-details';
-import { Keys, RenderPosition } from '../constants';
+import {
+  Keys,
+  RenderPosition,
+  UserAction,
+  UpdateType,
+} from '../constants';
+
 import {
   remove,
   renderElement,
@@ -100,6 +106,8 @@ export default class MovieCard {
   }) {
     if (isAddedToWatchList) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         this._filmCardData = {
           ...this._filmCardData,
           isWatchList: !this._filmCardData.isWatchList,
@@ -108,6 +116,8 @@ export default class MovieCard {
     }
     if (isAddedToWatched) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         this._filmCardData = {
           ...this._filmCardData,
           isWatched: !this._filmCardData.isWatched,
@@ -116,6 +126,9 @@ export default class MovieCard {
     }
     if (isAddedToFavorite) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
+
         this._filmCardData = {
           ...this._filmCardData,
           isFavorite: !this._filmCardData.isFavorite,

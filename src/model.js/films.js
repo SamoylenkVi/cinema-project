@@ -55,24 +55,19 @@ export default class Films extends Observer {
   }
 
   sortFilm(updateType, sortType) {
-    let sortFilm = [];
     switch (sortType) {
       case (SortType.DATE):
-        sortFilm = this._films.slice().sort(dateSort);
+        this._films = this._films.sort(dateSort);
         this.currentSortType = SortType.DATE;
         break;
       case (SortType.RATING):
-        sortFilm = this._films.slice().sort(ratingSort);
+        this._films = this._films.sort(ratingSort);
         this.currentSortType = SortType.RATING;
         break;
       default:
-        sortFilm = this._films;
+        this._films = this._defaultFilms;
         this.currentSortType = SortType.DEFAULT;
     }
-    this._notify(updateType, sortFilm);
-  }
-
-  updateFilter(updateType, update) {
-    this._notify(updateType, update);
+    this._notify(updateType, this._films);
   }
 }
