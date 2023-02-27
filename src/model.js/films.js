@@ -95,7 +95,7 @@ export default class Films extends Observer {
     this._filterFilms();
     this._sortFilms();
 
-    this._notify(updateType, update, this._filteredAndSortedFilms);
+    this._notify(updateType, this._filteredAndSortedFilms, update);
   }
 
   updateFilterFilms(updateType, filterType) {

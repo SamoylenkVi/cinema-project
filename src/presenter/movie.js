@@ -26,7 +26,7 @@ export default class MovieCard {
     this._page = document.querySelector('body');
 
     this._filmCard = null;
-    this._filmCardDetails = null;
+
     this._mode = Mode.DEFAULT;
 
     this._showFilmDetailsHandler = this._showFilmDetailsHandler.bind(this);
@@ -39,17 +39,13 @@ export default class MovieCard {
     this._filmCardData = filmCard;
 
     const prevFilmCard = this._filmCard;
-    const prevFilmCardDetails = this._filmCardDetails;
 
     this._filmCard = new FilmCardView(this._filmCardData);
-    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
 
     this._filmCard.setOpenPopupHandler(this._showFilmDetailsHandler);
     this._filmCard.setSpecialListHandler(this._addFilmToSpecialList);
-    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
-    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
 
-    if (prevFilmCard === null || prevFilmCardDetails === null) {
+    if (prevFilmCard === null) {
       renderElement(this.wrapperCard, this._filmCard, RenderPosition.BEFOREEND);
       return;
     }
@@ -58,22 +54,38 @@ export default class MovieCard {
       this.wrapperCard.replaceChild(this._filmCard.getElement(), prevFilmCard.getElement());
     }
 
-    if (this.filmDetailsWrapper.contains(prevFilmCardDetails.getElement())) {
+    remove(prevFilmCard);
+  }
+
+  updateFilmDetails(update) {
+    this._filmCardData = update;
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+    this._detailsButtonPosition = '';
+    if (this._prevFilmCardDetails) {
+      this._detailsButtonPosition = this._prevFilmCardDetails
+        .getElement().scrollTop;
       this.filmDetailsWrapper.replaceChild(
         this._filmCardDetails.getElement(),
-        prevFilmCardDetails.getElement(),
+        this._prevFilmCardDetails.getElement(),
       );
     }
-    remove(prevFilmCard);
-    remove(prevFilmCardDetails);
+
+    this._filmCardDetails.scrollToFavoriteButton(this._detailsButtonPosition);
+    this._prevFilmCardDetails = this._filmCardDetails;
+    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
+    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
   }
 
   _showFilmDetailsHandler() {
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+
+    this._prevFilmCardDetails = this._filmCardDetails;
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
     this._page.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escapeKeydownHandler);
+    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
-    this.changeMode();
+    this.changeMode(this);
     this._mode = Mode.POPUP;
   }
 
@@ -82,8 +94,8 @@ export default class MovieCard {
     this.filmDetailsWrapper.removeChild(this._filmCardDetails.getElement());
     this._page.classList.remove('hide-overflow');
     this._filmCardDetails.removeClickHandler();
-
     this._mode = Mode.DEFAULT;
+    this.changeMode();
   }
 
   _escapeKeydownHandler(evt) {
@@ -135,12 +147,9 @@ export default class MovieCard {
         },
       );
     }
-
-    this._filmCardDetails.scrollToFavoriteButton();
   }
 
   destroy() {
     remove(this._filmCard);
-    remove(this._filmCardDetails);
   }
 }

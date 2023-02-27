@@ -13,6 +13,7 @@ const TASK_COUNT_PER_STEP = 5;
 export default class MovieList {
   constructor(filmContainer, classNameSection, title, containerListAttribute, filmsModel) {
     this._filmsModel = filmsModel;
+    this._films = this._getFilms();
 
     this._filmContainer = filmContainer;
     this._emptyFilmMessage = new EmptyFilmMessageView();
@@ -32,12 +33,13 @@ export default class MovieList {
     );
 
     this._filmsPresenter = {};
+    this._filmPopupPresenter = null;
     this._movieWrapperList = null;
     this._renderedTaskCount = TASK_COUNT_PER_STEP;
   }
 
   _getFilms() {
-    return this._filmsModel.films;
+    return this._filmsModel.filteredAndSortedFilms;
   }
 
   init() {
@@ -51,51 +53,71 @@ export default class MovieList {
     this._movieWrapperList = this._movieWrapper.getFilmsListContainer();
   }
 
-  _handleModeChange() {
+  _handleModeChange(filmPresenter = null) {
+    if (!filmPresenter) {
+      this._filmPopupPresenter = filmPresenter;
+      return;
+    }
+
     Object
       .values(this._filmsPresenter)
       .forEach((presenter) => presenter.resetView());
+    this._filmPopupPresenter = filmPresenter;
   }
 
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case (UserAction.UPDATE_FILM):
-        this._filmsModel.updateFilm(updateType, update);
+        this._filmsModel.updateFilms(updateType, update);
         break;
       default:
     }
   }
 
-  _handleModelEvent(updateType, data) {
+  _handleModelEvent(updateType, data, updateCard) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmsPresenter[data.id].init(data);
+        if (this._filmPopupPresenter) {
+          this._filmPopupPresenter.updateFilmDetails(updateCard);
+        }
+        this._rerenderFilmList(data);
         break;
       case UpdateType.MINOR:
-        this._clearFilmList();
-        this._renderFilmList();
+        this._rerenderFilmList(data);
         break;
       case UpdateType.MAJOR:
+        this._renderedTaskCount = TASK_COUNT_PER_STEP;
+        this._rerenderFilmList(data);
         break;
       default:
     }
+  }
+
+  _rerenderFilmList(newData) {
+    this._films = newData;
+    this._clearFilmList();
+    this._renderFilmList();
   }
 
   _renderFilmList() {
-    const filmsCount = this._getFilms().length;
+    const filmsCount = this._films.length;
 
     if (filmsCount <= 0) {
       this._renderNoFilmsMessage();
       return;
     }
 
-    const films = this._getFilms().slice(0, Math.min(filmsCount, this._renderedTaskCount));
+    const films = this._films.slice(0, Math.min(filmsCount, this._renderedTaskCount));
 
     this._renderFilms(films);
 
     if (filmsCount > this._renderedTaskCount) {
       this._renderLoadMoreButton();
     }
+  }
+
+  _renderFilms(films) {
+    films.forEach((film) => this._renderFilmCard(film));
   }
 
   _renderFilmCard(film) {
@@ -109,22 +131,18 @@ export default class MovieList {
     this._filmsPresenter[film.id] = filmPresenter;
   }
 
-  _renderFilms(films) {
-    films.forEach((film) => this._renderFilmCard(film));
-  }
-
   _renderNoFilmsMessage() {
     renderElement(this._filmContainer, this._emptyFilmMessage, RenderPosition.BEFOREEND);
   }
 
   _handleLoadMoreButtonClick() {
-    const filmsCount = this._getFilms().length;
+    const filmsCount = this._films.length;
     const newRenderedFilmCount = Math.min(
       filmsCount,
       this._renderedTaskCount + TASK_COUNT_PER_STEP,
     );
 
-    const films = this._getFilms().slice(this._renderedTaskCount, newRenderedFilmCount);
+    const films = this._films.slice(this._renderedTaskCount, newRenderedFilmCount);
 
     this._renderFilms(films);
 
@@ -144,7 +162,10 @@ export default class MovieList {
   _clearFilmList() {
     Object
       .values(this._filmsPresenter)
-      .forEach((film) => film.destroy());
-    this._filmsPresenter = {};
+      .forEach((film) => {
+        film.destroy();
+      });
+    remove(this._emptyFilmMessage);
+    remove(this._showMoreButton);
   }
 }
