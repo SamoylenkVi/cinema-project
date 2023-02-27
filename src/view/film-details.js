@@ -180,7 +180,6 @@ export default class FilmCardDetails extends Smart {
     this._selectEmojiHandler = this._selectEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
 
-    this._formImage = this.getElement().querySelector('.film-details__add-emoji-label img');
     this._favoriteButtonWrapper = this.getElement().querySelector('.film-details__controls');
 
     this._setInnerHandlers();
@@ -217,8 +216,8 @@ export default class FilmCardDetails extends Smart {
     return createFilmDetailsTemplate(this._filmCardState);
   }
 
-  scrollToFavoriteButton() {
-    this._favoriteButtonWrapper.scrollIntoView({ block: 'center' });
+  scrollToFavoriteButton(buttonPosition) {
+    this.getElement().scrollTo(0, buttonPosition);
   }
 
   _setInnerHandlers() {
