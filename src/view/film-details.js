@@ -1,5 +1,4 @@
 import { addActiveButtonClass, convertsDate } from '../utils/card';
-import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 import Smart from './smart';
 
@@ -32,9 +31,8 @@ const createCommentItem = (items) => {
   return CommentMarkup.join('');
 };
 
-const createFilmDetailsTemplate = (movieCard) => {
+const createFilmDetailsTemplate = (movieCard, cardComments) => {
   const {
-    id,
     name,
     rating,
     poster,
@@ -54,8 +52,6 @@ const createFilmDetailsTemplate = (movieCard) => {
     selectedEmotion,
     commentText,
   } = movieCard;
-
-  const cardComments = allComments[id];
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -170,10 +166,11 @@ const createFilmDetailsTemplate = (movieCard) => {
 };
 
 export default class FilmCardDetails extends Smart {
-  constructor(filmCard) {
+  constructor(filmCard, filmComments) {
     super();
 
     this._filmCardState = FilmCardDetails.parseDataToState(filmCard);
+    this._filmComments = filmComments;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
@@ -213,7 +210,7 @@ export default class FilmCardDetails extends Smart {
   }
 
   getTemplate() {
-    return createFilmDetailsTemplate(this._filmCardState);
+    return createFilmDetailsTemplate(this._filmCardState, this._filmComments);
   }
 
   scrollToFavoriteButton(buttonPosition) {

@@ -11,9 +11,18 @@ import {
 const TASK_COUNT_PER_STEP = 5;
 
 export default class MovieList {
-  constructor(filmContainer, classNameSection, title, containerListAttribute, filmsModel) {
+  constructor(
+    filmContainer,
+    classNameSection,
+    title,
+    containerListAttribute,
+    filmsModel,
+    commentsModel,
+  ) {
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
     this._films = this._getFilms();
+    this._comments = this._commentsModel.comments;
 
     this._filmContainer = filmContainer;
     this._emptyFilmMessage = new EmptyFilmMessageView();
@@ -127,7 +136,10 @@ export default class MovieList {
       this._handleModeChange,
     );
 
-    filmPresenter.init(film);
+    const filmComments = this._comments[film.id];
+
+    filmPresenter.init(film, filmComments);
+
     this._filmsPresenter[film.id] = filmPresenter;
   }
 

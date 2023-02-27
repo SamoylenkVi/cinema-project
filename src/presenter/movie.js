@@ -26,6 +26,7 @@ export default class MovieCard {
     this._page = document.querySelector('body');
 
     this._filmCard = null;
+    this._filmComments = null;
 
     this._mode = Mode.DEFAULT;
 
@@ -35,12 +36,12 @@ export default class MovieCard {
     this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
 
-  init(filmCard) {
+  init(filmCard, filmComments) {
     this._filmCardData = filmCard;
-
+    this._filmComments = filmComments;
     const prevFilmCard = this._filmCard;
 
-    this._filmCard = new FilmCardView(this._filmCardData);
+    this._filmCard = new FilmCardView(this._filmCardData, this._filmComments);
 
     this._filmCard.setOpenPopupHandler(this._showFilmDetailsHandler);
     this._filmCard.setSpecialListHandler(this._addFilmToSpecialList);
@@ -59,7 +60,10 @@ export default class MovieCard {
 
   updateFilmDetails(update) {
     this._filmCardData = update;
-    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+    this._filmCardDetails = new FilmCardDetailsView(
+      this._filmCardData,
+      this._filmComments,
+    );
     this._detailsButtonPosition = '';
     if (this._prevFilmCardDetails) {
       this._detailsButtonPosition = this._prevFilmCardDetails
@@ -77,7 +81,7 @@ export default class MovieCard {
   }
 
   _showFilmDetailsHandler() {
-    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData, this._filmComments);
 
     this._prevFilmCardDetails = this._filmCardDetails;
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());

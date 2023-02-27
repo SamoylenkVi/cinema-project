@@ -14,7 +14,7 @@ const FILMS_LIST_ATTRIBUTE = {
 };
 
 export default class Page {
-  constructor(filmsModel) {
+  constructor(filmsModel, commentsModel) {
     this._filmsModel = filmsModel;
 
     this._mainElement = document.querySelector('.main');
@@ -27,6 +27,7 @@ export default class Page {
       MAIN_FILMS_TITLE,
       FILMS_LIST_ATTRIBUTE.MAIN,
       filmsModel,
+      commentsModel,
     );
 
     this._filterPresenter = new FilterMenuPresenter(this._mainElement, this._filmsModel);
