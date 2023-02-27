@@ -4,74 +4,110 @@ import SortCardMenuView from '../view/sort';
 import { renderElement } from '../utils/render';
 import {
   RenderPosition,
-  SortType,
   UserAction,
   UpdateType,
+  FilterType,
 } from '../constants';
-import { dateSort, ratingSort } from '../utils/card';
 
 export default class FilterMenu {
   constructor(filterContainer, filmsModel) {
-    this._filmsModel = filmsModel;
-
-    this._currentSortType = this._filmsModel.currentSortType;
-    this._currentFilterType = this._filmsModel.currentFilterType;
-
     this._filterContainer = filterContainer;
+    this._filmsModel = filmsModel;
+    this._films = this._filmsModel.films;
+
+    this._filteredCount = this._filteredFilm();
+
+    this._currentSortType = this._filmsModel.sortType;
+    this._currentFilterType = this._filmsModel.filterType;
 
     this._sortCardMenu = new SortCardMenuView(this._currentSortType);
-    this._filterMenu = new SiteMenuView(this._getFilms());
+    this._filterMenu = new SiteMenuView(this._filteredCount, this._currentFilterType);
 
     this._handleSortMovieCard = this._handleSortMovieCard.bind(this);
+    this._handleFilterMovieCard = this._handleFilterMovieCard.bind(this);
+
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
   }
 
-  _getFilms() {
-    switch (this._currentSortType) {
-      case (SortType.DATE):
-        return this._filmsModel.films.slice().sort(dateSort);
-      case (SortType.RATING):
-        return this._filmsModel.films.slice().sort(ratingSort);
-      default:
-        return this._filmsModel.films;
-    }
-  }
-
   init() {
+    this._filteredFilm();
     this._renderFilterMenu();
     this._renderSortFilms();
   }
 
   _handleViewAction(actionType, updateType, update) {
-    // eslint-disable-next-line default-case
     switch (actionType) {
       case (UserAction.SORT_FILMS):
-        this._filmsModel.sortFilm(updateType, update);
+        this._filmsModel.updateSortFilms(updateType, update);
         break;
+      case (UserAction.FILTER_FILMS):
+        this._filmsModel.updateFilterFilms(updateType, update);
+        break;
+      default:
     }
   }
 
   _handleModelEvent(updateType) {
-    // eslint-disable-next-line default-case
     switch (updateType) {
       case UpdateType.PATCH:
-        // - обновить часть списка (например, когда поменялось описание)
+        this._films = this._filmsModel.films;
+        this._filteredCount = this._filteredFilm();
+        this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
         break;
       case UpdateType.MINOR:
-        this._currentSortType = this._filmsModel.currentSortType;
+        this._films = this._filmsModel.films;
+        this._currentSortType = this._filmsModel.sortType;
         this._sortCardMenu.rerenderSort(this._currentSortType);
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
+        this._films = this._filmsModel.films;
+        this._currentFilterType = this._filmsModel.filterType;
+        this._currentSortType = this._filmsModel.sortType;
+
+        this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
+        this._sortCardMenu.rerenderSort(this._currentSortType);
         break;
+      default:
     }
+  }
+
+  _filteredFilm() {
+    const filteredCount = {
+      [FilterType.WATCHLIST]: 0,
+      [FilterType.HISTORY]: 0,
+      [FilterType.FAVORITES]: 0,
+    };
+
+    this._films.forEach(((element) => {
+      if (element.isFavorite) {
+        filteredCount[FilterType.FAVORITES] += 1;
+      }
+      if (element.isWatchList) {
+        filteredCount[FilterType.WATCHLIST] += 1;
+      }
+      if (element.isWatched) {
+        filteredCount[FilterType.HISTORY] += 1;
+      }
+    }));
+    return filteredCount;
+  }
+
+  _handleFilterMovieCard(filterType) {
+    if (this._currentFilterType === filterType) {
+      return;
+    }
+    this._handleViewAction(UserAction.FILTER_FILMS, UpdateType.MAJOR, filterType);
+
+    this._currentFilterType = filterType;
   }
 
   _renderFilterMenu() {
     renderElement(this._filterContainer, this._filterMenu, RenderPosition.AFTERBEGIN);
+
+    this._filterMenu.setFilterMovieHandler(this._handleFilterMovieCard);
   }
 
   _handleSortMovieCard(sortType) {
