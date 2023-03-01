@@ -12,9 +12,9 @@ const createGenreItem = (items) => {
 const createCommentItem = (items) => {
   const CommentMarkup = items.map((item) => {
     const {
-      user, emotion, commentText, commentDate,
+      id, user, emotion, commentText, commentDate,
     } = item;
-    return `<li class="film-details__comment">
+    return `<li class="film-details__comment" comment-id="${id}">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
@@ -176,6 +176,7 @@ export default class FilmCardDetails extends Smart {
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
     this._selectEmojiHandler = this._selectEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._addDeleteCommentHandler = this._addDeleteCommentHandler.bind(this);
 
     this._favoriteButtonWrapper = this.getElement().querySelector('.film-details__controls');
 
@@ -284,5 +285,28 @@ export default class FilmCardDetails extends Smart {
       'click',
       this._addToSpecialListHandler,
     );
+  }
+
+  _addDeleteCommentHandler(evt) {
+    evt.preventDefault();
+
+    const commentId = evt.currentTarget.getAttribute('comment-id');
+    this._callback.deleteComment(commentId);
+  }
+
+  setDeleteCommentHandler(callback) {
+    this._callback.deleteComment = callback;
+
+    this.getElement().querySelectorAll('.film-details__comment')
+      .forEach((commentItem) => {
+        commentItem.addEventListener('click', this._addDeleteCommentHandler);
+      });
+  }
+
+  deleteComment(commentsUpdate) {
+    this._filmComments = commentsUpdate;
+    this.getElement().querySelector('.film-details__comments-list').innerHTML = createCommentItem(this._filmComments);
+    this.getElement().querySelector('.film-details__comments-count').innerHTML = this._filmComments.length;
+    this.setDeleteCommentHandler(this._callback.deleteComment);
   }
 }

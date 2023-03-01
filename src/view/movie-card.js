@@ -82,4 +82,9 @@ export default class FilmCard extends AbstractView {
       this._addToSpecialListHandler,
     );
   }
+
+  updateCommentCounter(commentsUpdate) {
+    this._filmComments = commentsUpdate;
+    this.getElement().querySelector('.film-card__comments').innerHTML = `${this._filmComments.length} comments`;
+  }
 }

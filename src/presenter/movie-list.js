@@ -31,9 +31,11 @@ export default class MovieList {
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._handleModelCommentsEvent = this._handleModelCommentsEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelCommentsEvent);
 
     this._movieWrapper = new MovieWrapperView(
       classNameSection,
@@ -79,6 +81,9 @@ export default class MovieList {
       case (UserAction.UPDATE_FILM):
         this._filmsModel.updateFilms(updateType, update);
         break;
+      case (UserAction.DELETE_COMMENT):
+        this._commentsModel.deleteComments(updateType, update);
+        break;
       default:
     }
   }
@@ -97,6 +102,18 @@ export default class MovieList {
       case UpdateType.MAJOR:
         this._renderedTaskCount = TASK_COUNT_PER_STEP;
         this._rerenderFilmList(data);
+        break;
+      default:
+    }
+  }
+
+  _handleModelCommentsEvent(updateType, update) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        if (this._filmPopupPresenter) {
+          this._comments = this._commentsModel.comments;
+          this._filmPopupPresenter.updateComments(update);
+        }
         break;
       default:
     }

@@ -16,4 +16,12 @@ export default class Comments extends Observer {
   get comments() {
     return this._comments;
   }
+
+  deleteComments(updateType, update) {
+    this._comments = {
+      ...this._comments,
+      ...update,
+    };
+    this._notify(updateType, this._comments);
+  }
 }

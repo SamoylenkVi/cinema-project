@@ -32,6 +32,7 @@ export default class MovieCard {
 
     this._showFilmDetailsHandler = this._showFilmDetailsHandler.bind(this);
     this._closeFilmDetailsHandler = this._closeFilmDetailsHandler.bind(this);
+    this._deleteComment = this._deleteComment.bind(this);
     this._escapeKeydownHandler = this._escapeKeydownHandler.bind(this);
     this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
@@ -80,6 +81,12 @@ export default class MovieCard {
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
   }
 
+  updateComments(update) {
+    this._filmComments = update[this._filmCardData.id];
+    this._filmCardDetails.deleteComment(this._filmComments);
+    this._filmCard.updateCommentCounter(this._filmComments);
+  }
+
   _showFilmDetailsHandler() {
     this._filmCardDetails = new FilmCardDetailsView(this._filmCardData, this._filmComments);
 
@@ -89,6 +96,7 @@ export default class MovieCard {
     document.addEventListener('keydown', this._escapeKeydownHandler);
     this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
+    this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
     this.changeMode(this);
     this._mode = Mode.POPUP;
   }
@@ -155,5 +163,19 @@ export default class MovieCard {
 
   destroy() {
     remove(this._filmCard);
+  }
+
+  _deleteComment(commentId) {
+    const commentsId = this._filmCardData.id;
+
+    const updateComments = {
+      [commentsId]: this._filmComments.filter(({ id }) => id !== Number(commentId)),
+    };
+
+    this.changeData(
+      UserAction.DELETE_COMMENT,
+      UpdateType.PATCH,
+      updateComments,
+    );
   }
 }
