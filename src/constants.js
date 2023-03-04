@@ -7,6 +7,10 @@ export const ACTIVE_BUTTON_CLASS = 'film-card__controls-item--active';
 export const Keys = {
   ESCAPE: 'Escape',
   ESC: 'Esc',
+  COMMAND: 'metaKey',
+  CONTROL: 'ctrlKey',
+  ENTER: 'Enter',
+
 };
 export const RenderPosition = {
   AFTERBEGIN: 'afterbegin',
@@ -28,8 +32,7 @@ export const FilterType = {
 
 export const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
-  ADD_COMMENT: 'ADD_COMMENT',
-  DELETE_COMMENT: 'DELETE_COMMENT',
+  UPDATE_COMMENTS: 'UPDATE_COMMENTS',
   SORT_FILMS: 'SORT_FILMS',
   FILTER_FILMS: 'FILTER_FILMS',
 };

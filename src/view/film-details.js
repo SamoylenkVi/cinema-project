@@ -184,6 +184,10 @@ export default class FilmCardDetails extends Smart {
   }
 
   static parseDataToState(filmCard) {
+    if (filmCard.commentText) {
+      return filmCard;
+    }
+
     const filmState = {
       ...filmCard,
       isEmotion: false,
@@ -206,8 +210,12 @@ export default class FilmCardDetails extends Smart {
 
   reset(filmCard) {
     this.updateData(
-      FilmCardDetails.parseDataToState(filmCard),
+      FilmCardDetails.parseStateToData(filmCard),
     );
+  }
+
+  get state() {
+    return this._filmCardState;
   }
 
   getTemplate() {
@@ -234,6 +242,7 @@ export default class FilmCardDetails extends Smart {
     this._setInnerHandlers();
     this.setSpecialListHandler(this._callback.specialList);
     this.setClickHandler(this._callback.click);
+    this.setDeleteCommentHandler(this._callback.deleteComment);
   }
 
   _commentInputHandler(evt) {
@@ -271,6 +280,7 @@ export default class FilmCardDetails extends Smart {
 
   _addToSpecialListHandler(evt) {
     evt.preventDefault();
+
     this._callback.specialList({
       isAddedToWatchList: evt.target.hasAttribute('data-watchlist'),
       isAddedToWatched: evt.target.hasAttribute('data-watched'),
@@ -303,10 +313,31 @@ export default class FilmCardDetails extends Smart {
       });
   }
 
-  deleteComment(commentsUpdate) {
+  updateComment(commentsUpdate) {
+    if (this._filmComments.length < commentsUpdate.length) {
+      this.updateData({
+        isEmotion: false,
+        selectedEmotion: '',
+        commentText: '',
+      });
+    }
     this._filmComments = commentsUpdate;
     this.getElement().querySelector('.film-details__comments-list').innerHTML = createCommentItem(this._filmComments);
     this.getElement().querySelector('.film-details__comments-count').innerHTML = this._filmComments.length;
     this.setDeleteCommentHandler(this._callback.deleteComment);
+  }
+
+  addComment() {
+    if (!this._filmCardState.selectedEmotion || !this._filmCardState.commentText) {
+      return false;
+    }
+    const newComment = {
+      id: 5,
+      user: 'Non',
+      emotion: this._filmCardState.selectedEmotion,
+      commentText: this._filmCardState.commentText,
+      data: '2020-03-20',
+    };
+    return newComment;
   }
 }

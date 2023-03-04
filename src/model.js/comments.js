@@ -17,7 +17,7 @@ export default class Comments extends Observer {
     return this._comments;
   }
 
-  deleteComments(updateType, update) {
+  updateComments(updateType, update) {
     this._comments = {
       ...this._comments,
       ...update,

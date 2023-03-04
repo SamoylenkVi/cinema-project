@@ -34,12 +34,14 @@ export default class MovieCard {
     this._closeFilmDetailsHandler = this._closeFilmDetailsHandler.bind(this);
     this._deleteComment = this._deleteComment.bind(this);
     this._escapeKeydownHandler = this._escapeKeydownHandler.bind(this);
+    this._addCommentHandler = this._addCommentHandler.bind(this);
     this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
 
   init(filmCard, filmComments) {
     this._filmCardData = filmCard;
     this._filmComments = filmComments;
+    this._filmId = this._filmCardData.id;
     const prevFilmCard = this._filmCard;
 
     this._filmCard = new FilmCardView(this._filmCardData, this._filmComments);
@@ -60,12 +62,19 @@ export default class MovieCard {
   }
 
   updateFilmDetails(update) {
-    this._filmCardData = update;
+    this._filmCardData = {
+      ...update,
+      commentText: this._prevFilmCardDetails.state.commentText,
+      isEmotion: this._prevFilmCardDetails.state.isEmotion,
+      selectedEmotion: this._prevFilmCardDetails.state.selectedEmotion,
+    };
+
     this._filmCardDetails = new FilmCardDetailsView(
       this._filmCardData,
       this._filmComments,
     );
     this._detailsButtonPosition = '';
+
     if (this._prevFilmCardDetails) {
       this._detailsButtonPosition = this._prevFilmCardDetails
         .getElement().scrollTop;
@@ -79,12 +88,13 @@ export default class MovieCard {
     this._prevFilmCardDetails = this._filmCardDetails;
     this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
+    this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
   }
 
   updateComments(update) {
-    this._filmComments = update[this._filmCardData.id];
-    this._filmCardDetails.deleteComment(this._filmComments);
+    this._filmComments = update[this._filmId];
     this._filmCard.updateCommentCounter(this._filmComments);
+    this._filmCardDetails.updateComment(this._filmComments);
   }
 
   _showFilmDetailsHandler() {
@@ -94,6 +104,7 @@ export default class MovieCard {
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
     this._page.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escapeKeydownHandler);
+    document.addEventListener('keydown', this._addCommentHandler);
     this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
     this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
@@ -108,12 +119,35 @@ export default class MovieCard {
     this._filmCardDetails.removeClickHandler();
     this._mode = Mode.DEFAULT;
     this.changeMode();
+    document.removeEventListener('keydown', this._addCommentHandler);
   }
 
   _escapeKeydownHandler(evt) {
     if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
       this._closeFilmDetailsHandler();
       document.removeEventListener('keydown', this._escapeKeydownHandler);
+    }
+  }
+
+  _addCommentHandler(evt) {
+    if (evt.code === Keys.ENTER && (evt[Keys.COMMAND] || evt[Keys.CONTROL])) {
+      const newComment = this._filmCardDetails.addComment();
+
+      if (newComment) {
+        this._filmComments = [
+          ...this._filmComments.slice(),
+          newComment,
+        ];
+        const updateComments = {
+          [this._filmId]: this._filmComments,
+        };
+
+        this.changeData(
+          UserAction.UPDATE_COMMENTS,
+          UpdateType.PATCH,
+          updateComments,
+        );
+      }
     }
   }
 
@@ -166,14 +200,12 @@ export default class MovieCard {
   }
 
   _deleteComment(commentId) {
-    const commentsId = this._filmCardData.id;
-
     const updateComments = {
-      [commentsId]: this._filmComments.filter(({ id }) => id !== Number(commentId)),
+      [this._filmId]: this._filmComments.filter(({ id }) => id !== Number(commentId)),
     };
 
     this.changeData(
-      UserAction.DELETE_COMMENT,
+      UserAction.UPDATE_COMMENTS,
       UpdateType.PATCH,
       updateComments,
     );

@@ -81,8 +81,8 @@ export default class MovieList {
       case (UserAction.UPDATE_FILM):
         this._filmsModel.updateFilms(updateType, update);
         break;
-      case (UserAction.DELETE_COMMENT):
-        this._commentsModel.deleteComments(updateType, update);
+      case (UserAction.UPDATE_COMMENTS):
+        this._commentsModel.updateComments(updateType, update);
         break;
       default:
     }
@@ -113,6 +113,7 @@ export default class MovieList {
         if (this._filmPopupPresenter) {
           this._comments = this._commentsModel.comments;
           this._filmPopupPresenter.updateComments(update);
+          this._rerenderFilmList(this._films);
         }
         break;
       default:
