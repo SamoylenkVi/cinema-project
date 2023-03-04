@@ -1,3 +1,4 @@
+import he from 'he';
 import { addActiveButtonClass, convertsDate } from '../utils/card';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 import Smart from './smart';
@@ -19,7 +20,7 @@ const createCommentItem = (items) => {
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
-        <p class="film-details__comment-text">${commentText}</p>
+        <p class="film-details__comment-text">${he.encode(commentText)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${user}</span>
           <span class="film-details__comment-day">${convertsDate(commentDate, COMMENT_DATE_FORMAT)}</span>
