@@ -299,10 +299,12 @@ export default class FilmCardDetails extends Smart {
   }
 
   _addDeleteCommentHandler(evt) {
-    evt.preventDefault();
+    if (evt.target.className === 'film-details__comment-delete') {
+      evt.preventDefault();
 
-    const commentId = evt.currentTarget.getAttribute('comment-id');
-    this._callback.deleteComment(commentId);
+      const commentId = evt.currentTarget.getAttribute('comment-id');
+      this._callback.deleteComment(commentId);
+    }
   }
 
   setDeleteCommentHandler(callback) {
