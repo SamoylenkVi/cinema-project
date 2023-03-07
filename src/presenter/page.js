@@ -1,7 +1,8 @@
 import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
+import StatisticView from '../view/stats';
 import FilterMenuPresenter from './filter-menu';
-import { RenderPosition } from '../constants';
+import { RenderPosition, FilterMode } from '../constants';
 import { renderElement } from '../utils/render';
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
@@ -20,6 +21,7 @@ export default class Page {
     this._mainElement = document.querySelector('.main');
 
     this._allMovieWrapper = new GenericMovieWrapperView();
+    this._statistic = new StatisticView();
 
     this._moviePresenter = new MovieListPresenter(
       this._allMovieWrapper,
@@ -30,9 +32,8 @@ export default class Page {
       commentsModel,
     );
 
-    this._filterPresenter = new FilterMenuPresenter(this._mainElement, this._filmsModel);
-
-    this._filmsCardsDefault = null;
+    this._filterPresenter = null;
+    this._handleShowStatistic = this._handleShowStatistic.bind(this);
   }
 
   _getFilms() {
@@ -40,12 +41,38 @@ export default class Page {
   }
 
   init() {
+    this._filterPresenter = new FilterMenuPresenter(
+      this._mainElement,
+      this._filmsModel,
+      this._handleShowStatistic,
+    );
     this._filterPresenter.init();
     this._renderAllMovieWrapper();
     this._moviePresenter.init();
+    this._renderStatistic();
+    this._handleShowFilms();
   }
 
   _renderAllMovieWrapper() {
     renderElement(this._mainElement, this._allMovieWrapper, RenderPosition.BEFOREEND);
+  }
+
+  _renderStatistic() {
+    renderElement(this._mainElement, this._statistic, RenderPosition.BEFOREEND);
+  }
+
+  _handleShowFilms() {
+    this._statistic.hide();
+    this._allMovieWrapper.show();
+  }
+
+  _handleShowStatistic() {
+    if (this._filterPresenter.filterMode === FilterMode.MOVIES) {
+      this._filterPresenter.selectStatisticHandler();
+      this._allMovieWrapper.hide();
+      this._statistic.show();
+      return;
+    }
+    this._handleShowFilms();
   }
 }

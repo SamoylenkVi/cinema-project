@@ -7,14 +7,17 @@ import {
   UserAction,
   UpdateType,
   FilterType,
+  FilterMode,
 } from '../constants';
 
 export default class FilterMenu {
-  constructor(filterContainer, filmsModel) {
+  constructor(filterContainer, filmsModel, handleStatistic) {
     this._filterContainer = filterContainer;
     this._filmsModel = filmsModel;
+    this._handleStatistic = handleStatistic;
     this._films = this._filmsModel.films;
 
+    this.filterMode = FilterMode.MOVIES;
     this._filteredCount = this._filteredFilm();
 
     this._currentSortType = this._filmsModel.sortType;
@@ -66,7 +69,10 @@ export default class FilterMenu {
         this._films = this._filmsModel.films;
         this._currentFilterType = this._filmsModel.filterType;
         this._currentSortType = this._filmsModel.sortType;
-
+        if (this.filterMode === FilterMode.STATISTIC) {
+          this._handleStatistic();
+          this.filterMode = FilterMode.MOVIES;
+        }
         this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
         this._sortCardMenu.rerenderSort(this._currentSortType);
         break;
@@ -108,6 +114,7 @@ export default class FilterMenu {
     renderElement(this._filterContainer, this._filterMenu, RenderPosition.AFTERBEGIN);
 
     this._filterMenu.setFilterMovieHandler(this._handleFilterMovieCard);
+    this._filterMenu.setShowStatisticHandler(this._handleStatistic);
   }
 
   _handleSortMovieCard(sortType) {
@@ -124,5 +131,12 @@ export default class FilterMenu {
     renderElement(this._filterContainer, this._sortCardMenu, RenderPosition.BEFOREEND);
 
     this._sortCardMenu.setSortMovieHandler(this._handleSortMovieCard);
+  }
+
+  selectStatisticHandler() {
+    this.filterMode = FilterMode.STATISTIC;
+    this._sortCardMenu.hide();
+    this._currentFilterType = FilterType.STATISTIC;
+    this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
   }
 }

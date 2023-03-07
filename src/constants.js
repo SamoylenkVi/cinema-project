@@ -28,6 +28,12 @@ export const FilterType = {
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
+  STATISTIC: 'statistic',
+};
+
+export const FilterMode = {
+  MOVIES: 'movies',
+  STATISTIC: 'statistic',
 };
 
 export const UserAction = {

@@ -1,4 +1,5 @@
 import Smart from './smart';
+import { FilterType } from '../constants';
 
 const createFilterLink = (filters, activeFilterType) => {
   const filterMarkup = Object.entries(filters).map(([filterName, count]) => `
@@ -17,10 +18,10 @@ const createFilterLink = (filters, activeFilterType) => {
 const createMenuTemplate = (filters, activeFilterType) => `
   <nav class="main-navigation">
       <div class="main-navigation__items">
-        <a href="#all" class="main-navigation__item ${activeFilterType === 'all' ? 'main-navigation__item--active' : ''}">All movies</a>
+        <a href="#all" class="main-navigation__item ${activeFilterType === FilterType.ALL_MOVIES ? 'main-navigation__item--active' : ''}">All movies</a>
         ${createFilterLink(filters, activeFilterType)}
       </div>
-      <a href="#stats" class="main-navigation__additional main-navigation__additional--active">Stats</a>
+      <a href="#stats" class="main-navigation__additional ${activeFilterType === FilterType.STATISTIC ? 'main-navigation__additional--active' : ''}">Stats</a>
   </nav>`;
 
 export default class SiteMenu extends Smart {
@@ -29,6 +30,7 @@ export default class SiteMenu extends Smart {
     this._filters = filters;
     this._currentFilterType = filterType;
     this._addFilterMovieHandler = this._addFilterMovieHandler.bind(this);
+    this._addShowStatisticHandler = this._addShowStatisticHandler.bind(this);
   }
 
   getTemplate() {
@@ -37,6 +39,7 @@ export default class SiteMenu extends Smart {
 
   restoreHandlers() {
     this.setFilterMovieHandler(this._callback.filterMovie);
+    this.setShowStatisticHandler(this._callback.showStatistic);
   }
 
   rerenderFilter(filters, filterType) {
@@ -57,5 +60,17 @@ export default class SiteMenu extends Smart {
 
     this.getElement()
       .querySelector('.main-navigation__items').addEventListener('click', this._addFilterMovieHandler);
+  }
+
+  _addShowStatisticHandler(evt) {
+    evt.preventDefault();
+
+    this._callback.showStatistic();
+  }
+
+  setShowStatisticHandler(callback) {
+    this._callback.showStatistic = callback;
+
+    this.getElement().querySelector('.main-navigation__additional').addEventListener('click', this._addShowStatisticHandler);
   }
 }

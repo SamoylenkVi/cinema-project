@@ -1107,3 +1107,6 @@ button {
   padding-top: 50px;
   padding-bottom: 50px;
 }
+.hide-component {
+  display: none;
+}
