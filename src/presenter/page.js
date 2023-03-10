@@ -20,8 +20,9 @@ export default class Page {
 
     this._mainElement = document.querySelector('.main');
 
+    this._films = this._filmsModel.films;
     this._allMovieWrapper = new GenericMovieWrapperView();
-    this._statistic = new StatisticView();
+    this._statistic = new StatisticView(this._films);
 
     this._moviePresenter = new MovieListPresenter(
       this._allMovieWrapper,

@@ -1,6 +1,77 @@
-import AbstractView from './abstract';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
+import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
 
-const createStatsTemplate = () => `
+import Smart from './smart';
+import { TIME_REG } from '../constants';
+
+dayjs.extend(duration);
+
+const renderFilmChart = (chart) => {
+  const BAR_HEIGHT = 50;
+  // eslint-disable-next-line no-param-reassign
+  chart.height = BAR_HEIGHT * 5;
+
+  return new Chart(chart, {
+    plugins: [ChartDataLabels],
+    type: 'horizontalBar',
+    data: {
+      labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],
+      datasets: [{
+        data: [11, 8, 7, 4, 3],
+        backgroundColor: '#ffe800',
+        hoverBackgroundColor: '#ffe800',
+        anchor: 'start',
+      }],
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20,
+          },
+          color: '#ffffff',
+          anchor: 'start',
+          align: 'start',
+          offset: 40,
+        },
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: '#ffffff',
+            padding: 100,
+            fontSize: 20,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+          barThickness: 24,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+      },
+      legend: {
+        display: false,
+      },
+      tooltips: {
+        enabled: false,
+      },
+    },
+  });
+};
+
+const createStatsTemplate = (filmCount, hourDuration, minutesDuration, topGenre) => `
 <section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -30,15 +101,15 @@ const createStatsTemplate = () => `
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${filmCount} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${hourDuration}<span class="statistic__item-description">h</span>${minutesDuration}<span class="statistic__item-description">m</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
+        <p class="statistic__item-text">${topGenre}</p>
       </li>
     </ul>
 
@@ -48,8 +119,83 @@ const createStatsTemplate = () => `
 
   </section>`;
 
-export default class Statistic extends AbstractView {
+export default class Statistic extends Smart {
+  constructor(films) {
+    super();
+    this._films = films.slice();
+
+    this._filmStatistic = null;
+    this._hourDuration = null;
+    this._minutesDuration = null;
+    this._topGenre = null;
+
+    this._calculateStatisticFilm();
+    this._humanizeDurationTime();
+    this._findsTopGenre();
+    this._filmCount = this._filmStatistic.watchedFilm;
+
+    this._filmsChart = null;
+    this._setCharts();
+  }
+
   getTemplate() {
-    return createStatsTemplate();
+    return createStatsTemplate(
+      this._filmCount,
+      this._hourDuration,
+      this._minutesDuration,
+      this._topGenre,
+    );
+  }
+
+  _calculateStatisticFilm() {
+    const initialValue = {
+      watchedFilm: 0,
+      totalDuration: dayjs.duration({
+        hours: 0,
+        minutes: 0,
+      }),
+      favoriteGenre: {},
+    };
+
+    this._filmStatistic = this._films.reduce((accumulator, currentValue) => {
+      if (currentValue.isWatched) {
+        accumulator.watchedFilm += 1;
+        const filmTime = currentValue.filmDuration.match(TIME_REG);
+        const hours = Number(filmTime[1]);
+        const minutes = Number(filmTime[2]);
+
+        accumulator.totalDuration = accumulator.totalDuration.add({ hours, minutes });
+
+        currentValue.genre.forEach((genre) => {
+          if (accumulator.favoriteGenre[genre] !== undefined) {
+            accumulator.favoriteGenre[genre] += 1;
+          } else {
+            accumulator.favoriteGenre[genre] = 1;
+          }
+        });
+      }
+      return accumulator;
+    }, initialValue);
+  }
+
+  _humanizeDurationTime() {
+    this._hourDuration = Math.floor(this._filmStatistic.totalDuration.asMinutes() / 60);
+    this._minutesDuration = this._filmStatistic.totalDuration.asMinutes() % 60;
+  }
+
+  _findsTopGenre() {
+    const topGenre = Object.entries(this._filmStatistic.favoriteGenre)
+      .reduce((a, b) => (a[1] > b[1] ? a : b));
+    const [genreName] = topGenre;
+    this._topGenre = genreName;
+  }
+
+  _setCharts() {
+    if (this._filmsChart !== null) {
+      this._filmsChart = null;
+    }
+
+    const chart = this.getElement().querySelector('.statistic__chart');
+    this._filmsChart = renderFilmChart(chart);
   }
 }
