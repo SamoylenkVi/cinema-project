@@ -8,18 +8,18 @@ import { TIME_REG } from '../constants';
 
 dayjs.extend(duration);
 
-const renderFilmChart = (chart) => {
+const renderFilmChart = (chart, genreName, genreCount) => {
   const BAR_HEIGHT = 50;
   // eslint-disable-next-line no-param-reassign
-  chart.height = BAR_HEIGHT * 5;
+  chart.height = BAR_HEIGHT * genreCount.length;
 
   return new Chart(chart, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],
+      labels: genreName,
       datasets: [{
-        data: [11, 8, 7, 4, 3],
+        data: genreCount,
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
         anchor: 'start',
@@ -129,9 +129,12 @@ export default class Statistic extends Smart {
     this._minutesDuration = null;
     this._topGenre = null;
 
+    this._statisticGenre = [];
+    this._statisticGenreCount = [];
+
     this._calculateStatisticFilm();
     this._humanizeDurationTime();
-    this._findsTopGenre();
+
     this._filmCount = this._filmStatistic.watchedFilm;
 
     this._filmsChart = null;
@@ -183,11 +186,17 @@ export default class Statistic extends Smart {
     this._minutesDuration = this._filmStatistic.totalDuration.asMinutes() % 60;
   }
 
-  _findsTopGenre() {
-    const topGenre = Object.entries(this._filmStatistic.favoriteGenre)
-      .reduce((a, b) => (a[1] > b[1] ? a : b));
-    const [genreName] = topGenre;
-    this._topGenre = genreName;
+  _sortedGenreStatistic() {
+    const sortGenre = Object.entries(this._filmStatistic.favoriteGenre)
+      .sort((a, b) => b[1] - a[1]);
+
+    const [genreTopName] = sortGenre[0];
+    this._topGenre = genreTopName;
+
+    sortGenre.forEach(([genreName, count]) => {
+      this._statisticGenre.push(genreName);
+      this._statisticGenreCount.push(count);
+    });
   }
 
   _setCharts() {
@@ -195,7 +204,8 @@ export default class Statistic extends Smart {
       this._filmsChart = null;
     }
 
+    this._sortedGenreStatistic();
     const chart = this.getElement().querySelector('.statistic__chart');
-    this._filmsChart = renderFilmChart(chart);
+    this._filmsChart = renderFilmChart(chart, this._statisticGenre, this._statisticGenreCount);
   }
 }
