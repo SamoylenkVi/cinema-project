@@ -2,7 +2,7 @@ import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
 import StatisticView from '../view/stats';
 import FilterMenuPresenter from './filter-menu';
-import { RenderPosition, FilterMode } from '../constants';
+import { RenderPosition, FilterMode, UpdateType } from '../constants';
 import { renderElement } from '../utils/render';
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
@@ -35,6 +35,8 @@ export default class Page {
 
     this._filterPresenter = null;
     this._handleShowStatistic = this._handleShowStatistic.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._filmsModel.addObserver(this._handleModelEvent);
   }
 
   _getFilms() {
@@ -65,6 +67,16 @@ export default class Page {
   _handleShowFilms() {
     this._statistic.hide();
     this._allMovieWrapper.show();
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._statistic.rerenderStatistic(data);
+        this._handleShowFilms();
+        break;
+      default:
+    }
   }
 
   _handleShowStatistic() {
