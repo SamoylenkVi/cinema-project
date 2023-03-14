@@ -1,8 +1,8 @@
-import SortCardMenuView from '../view/sort';
 import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
-import { RenderPosition } from '../constants';
-
+import StatisticView from '../view/stats';
+import FilterMenuPresenter from './filter-menu';
+import { RenderPosition, FilterMode, UpdateType } from '../constants';
 import { renderElement } from '../utils/render';
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
@@ -15,63 +15,77 @@ const FILMS_LIST_ATTRIBUTE = {
 };
 
 export default class Page {
-  constructor() {
+  constructor(filmsModel, commentsModel) {
+    this._filmsModel = filmsModel;
+
     this._mainElement = document.querySelector('.main');
+
+    this._films = this._filmsModel.films;
     this._allMovieWrapper = new GenericMovieWrapperView();
+    this._statistic = new StatisticView(this._films);
 
     this._moviePresenter = new MovieListPresenter(
       this._allMovieWrapper,
       MAIN_FILMS_WRAPPER,
       MAIN_FILMS_TITLE,
       FILMS_LIST_ATTRIBUTE.MAIN,
+      filmsModel,
+      commentsModel,
     );
 
-    this._sortCardMenu = new SortCardMenuView();
-
-    this._handleSortMovieCard = this._handleSortMovieCard.bind(this);
-
-    this._filmsCardsDefault = null;
+    this._filterPresenter = null;
+    this._handleShowStatistic = this._handleShowStatistic.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._filmsModel.addObserver(this._handleModelEvent);
   }
 
-  init(filmsCards) {
-    this._filmsCardsDefault = filmsCards;
-    this._filmsCard = filmsCards.slice();
+  _getFilms() {
+    return this._filmsModel.films;
+  }
 
-    this._renderSortFilms();
+  init() {
+    this._filterPresenter = new FilterMenuPresenter(
+      this._mainElement,
+      this._filmsModel,
+      this._handleShowStatistic,
+    );
+    this._filterPresenter.init();
     this._renderAllMovieWrapper();
-    this._moviePresenter.init(this._filmsCard);
-  }
-
-  _handleSortMovieCard({
-    isSortDefault,
-    isSortDate,
-    isSortRating,
-  }) {
-    if (isSortDefault) {
-      const cardsByDefault = this._filmsCardsDefault.slice();
-      this._moviePresenter.sortFilms(cardsByDefault);
-    }
-
-    if (isSortDate) {
-      this._filmsCard.sort((a, b) => b.productionYear - a.productionYear);
-
-      this._moviePresenter.sortFilms(this._filmsCard);
-    }
-
-    if (isSortRating) {
-      this._filmsCard.sort((a, b) => b.rating - a.rating);
-
-      this._moviePresenter.sortFilms(this._filmsCard);
-    }
-  }
-
-  _renderSortFilms() {
-    renderElement(this._mainElement, this._sortCardMenu, RenderPosition.BEFOREEND);
-
-    this._sortCardMenu.setSortMovieHandler(this._handleSortMovieCard);
+    this._moviePresenter.init();
+    this._renderStatistic();
+    this._handleShowFilms();
   }
 
   _renderAllMovieWrapper() {
     renderElement(this._mainElement, this._allMovieWrapper, RenderPosition.BEFOREEND);
+  }
+
+  _renderStatistic() {
+    renderElement(this._mainElement, this._statistic, RenderPosition.BEFOREEND);
+  }
+
+  _handleShowFilms() {
+    this._statistic.hide();
+    this._allMovieWrapper.show();
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._statistic.rerenderStatistic(data);
+        this._handleShowFilms();
+        break;
+      default:
+    }
+  }
+
+  _handleShowStatistic() {
+    if (this._filterPresenter.filterMode === FilterMode.MOVIES) {
+      this._filterPresenter.selectStatisticHandler();
+      this._allMovieWrapper.hide();
+      this._statistic.show();
+      return;
+    }
+    this._handleShowFilms();
   }
 }

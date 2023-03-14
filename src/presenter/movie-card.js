@@ -1,6 +1,12 @@
 import FilmCardView from '../view/movie-card';
 import FilmCardDetailsView from '../view/film-details';
-import { Keys, RenderPosition } from '../constants';
+import {
+  Keys,
+  RenderPosition,
+  UserAction,
+  UpdateType,
+} from '../constants';
+
 import {
   remove,
   renderElement,
@@ -20,30 +26,30 @@ export default class MovieCard {
     this._page = document.querySelector('body');
 
     this._filmCard = null;
-    this._filmCardDetails = null;
+    this._filmComments = null;
+
     this._mode = Mode.DEFAULT;
 
     this._showFilmDetailsHandler = this._showFilmDetailsHandler.bind(this);
     this._closeFilmDetailsHandler = this._closeFilmDetailsHandler.bind(this);
+    this._deleteComment = this._deleteComment.bind(this);
     this._escapeKeydownHandler = this._escapeKeydownHandler.bind(this);
+    this._addCommentHandler = this._addCommentHandler.bind(this);
     this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
 
-  init(filmCard) {
+  init(filmCard, filmComments) {
     this._filmCardData = filmCard;
-
+    this._filmComments = filmComments;
+    this._filmId = this._filmCardData.id;
     const prevFilmCard = this._filmCard;
-    const prevFilmCardDetails = this._filmCardDetails;
 
-    this._filmCard = new FilmCardView(this._filmCardData);
-    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData);
+    this._filmCard = new FilmCardView(this._filmCardData, this._filmComments);
 
     this._filmCard.setOpenPopupHandler(this._showFilmDetailsHandler);
     this._filmCard.setSpecialListHandler(this._addFilmToSpecialList);
-    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
-    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
 
-    if (prevFilmCard === null || prevFilmCardDetails === null) {
+    if (prevFilmCard === null) {
       renderElement(this.wrapperCard, this._filmCard, RenderPosition.BEFOREEND);
       return;
     }
@@ -52,22 +58,57 @@ export default class MovieCard {
       this.wrapperCard.replaceChild(this._filmCard.getElement(), prevFilmCard.getElement());
     }
 
-    if (this.filmDetailsWrapper.contains(prevFilmCardDetails.getElement())) {
+    remove(prevFilmCard);
+  }
+
+  updateFilmDetails(update) {
+    this._filmCardData = {
+      ...update,
+      commentText: this._prevFilmCardDetails.state.commentText,
+      isEmotion: this._prevFilmCardDetails.state.isEmotion,
+      selectedEmotion: this._prevFilmCardDetails.state.selectedEmotion,
+    };
+
+    this._filmCardDetails = new FilmCardDetailsView(
+      this._filmCardData,
+      this._filmComments,
+    );
+    this._detailsButtonPosition = '';
+
+    if (this._prevFilmCardDetails) {
+      this._detailsButtonPosition = this._prevFilmCardDetails
+        .getElement().scrollTop;
       this.filmDetailsWrapper.replaceChild(
         this._filmCardDetails.getElement(),
-        prevFilmCardDetails.getElement(),
+        this._prevFilmCardDetails.getElement(),
       );
     }
-    remove(prevFilmCard);
-    remove(prevFilmCardDetails);
+
+    this._filmCardDetails.scrollToFavoriteButton(this._detailsButtonPosition);
+    this._prevFilmCardDetails = this._filmCardDetails;
+    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
+    this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
+    this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
+  }
+
+  updateComments(update) {
+    this._filmComments = update[this._filmId];
+    this._filmCard.updateCommentCounter(this._filmComments);
+    this._filmCardDetails.updateComment(this._filmComments);
   }
 
   _showFilmDetailsHandler() {
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData, this._filmComments);
+
+    this._prevFilmCardDetails = this._filmCardDetails;
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
     this._page.classList.add('hide-overflow');
     document.addEventListener('keydown', this._escapeKeydownHandler);
+    document.addEventListener('keydown', this._addCommentHandler);
+    this._filmCardDetails.setSpecialListHandler(this._addFilmToSpecialList);
     this._filmCardDetails.setClickHandler(this._closeFilmDetailsHandler);
-    this.changeMode();
+    this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
+    this.changeMode(this);
     this._mode = Mode.POPUP;
   }
 
@@ -76,14 +117,37 @@ export default class MovieCard {
     this.filmDetailsWrapper.removeChild(this._filmCardDetails.getElement());
     this._page.classList.remove('hide-overflow');
     this._filmCardDetails.removeClickHandler();
-
     this._mode = Mode.DEFAULT;
+    this.changeMode();
+    document.removeEventListener('keydown', this._addCommentHandler);
   }
 
   _escapeKeydownHandler(evt) {
     if (evt.key === Keys.ESCAPE || evt.key === Keys.ESC) {
       this._closeFilmDetailsHandler();
       document.removeEventListener('keydown', this._escapeKeydownHandler);
+    }
+  }
+
+  _addCommentHandler(evt) {
+    if (evt.code === Keys.ENTER && (evt[Keys.COMMAND] || evt[Keys.CONTROL])) {
+      const newComment = this._filmCardDetails.addComment();
+
+      if (newComment) {
+        this._filmComments = [
+          ...this._filmComments.slice(),
+          newComment,
+        ];
+        const updateComments = {
+          [this._filmId]: this._filmComments,
+        };
+
+        this.changeData(
+          UserAction.UPDATE_COMMENTS,
+          UpdateType.PATCH,
+          updateComments,
+        );
+      }
     }
   }
 
@@ -100,6 +164,8 @@ export default class MovieCard {
   }) {
     if (isAddedToWatchList) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         this._filmCardData = {
           ...this._filmCardData,
           isWatchList: !this._filmCardData.isWatchList,
@@ -108,6 +174,8 @@ export default class MovieCard {
     }
     if (isAddedToWatched) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
         this._filmCardData = {
           ...this._filmCardData,
           isWatched: !this._filmCardData.isWatched,
@@ -116,18 +184,30 @@ export default class MovieCard {
     }
     if (isAddedToFavorite) {
       this.changeData(
+        UserAction.UPDATE_FILM,
+        UpdateType.PATCH,
+
         this._filmCardData = {
           ...this._filmCardData,
           isFavorite: !this._filmCardData.isFavorite,
         },
       );
     }
-
-    this._filmCardDetails.scrollToFavoriteButton();
   }
 
   destroy() {
     remove(this._filmCard);
-    remove(this._filmCardDetails);
+  }
+
+  _deleteComment(commentId) {
+    const updateComments = {
+      [this._filmId]: this._filmComments.filter(({ id }) => id !== Number(commentId)),
+    };
+
+    this.changeData(
+      UserAction.UPDATE_COMMENTS,
+      UpdateType.PATCH,
+      updateComments,
+    );
   }
 }

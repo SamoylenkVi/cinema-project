@@ -37,6 +37,7 @@ const emotion = [
 ];
 
 const createComment = () => ({
+  id: getRandomInteger(0, 10),
   user: getRandomItem(user),
   emotion: getRandomItem(emotion),
   commentText: getRandomItem(commentText),

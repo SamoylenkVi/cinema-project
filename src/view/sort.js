@@ -1,35 +1,38 @@
-import AbstractView from './abstract';
+import Smart from './smart';
+import { SortType } from '../constants';
 
-const createSortCardTemplate = () => `
+const createSortCardTemplate = (currentSortType) => `
 <ul class="sort">
-<li><a href="#" data-sort-default class="sort__button sort__button--active">Sort by default</a></li>
-<li><a href="#" data-sort-date class="sort__button">Sort by date</a></li>
-<li><a href="#" data-sort-rating class="sort__button">Sort by rating</a></li>
+<li><a href="#" data-sort="${SortType.DEFAULT}" class="sort__button ${currentSortType === 'default' ? 'sort__button--active' : ''}">Sort by default</a></li>
+<li><a href="#" data-sort="${SortType.DATE}" class="sort__button ${currentSortType === 'date' ? 'sort__button--active' : ''}">Sort by date</a></li>
+<li><a href="#" data-sort="${SortType.RATING}" class="sort__button ${currentSortType === 'rating' ? 'sort__button--active' : ''}">Sort by rating</a></li>
 </ul>`;
 
-export default class SortCardMenu extends AbstractView {
-  constructor() {
+export default class SortCardMenu extends Smart {
+  constructor(sortType) {
     super();
-
+    this._currentSortType = sortType;
     this._addSortMovieHandler = this._addSortMovieHandler.bind(this);
   }
 
   getTemplate() {
-    return createSortCardTemplate();
+    return createSortCardTemplate(this._currentSortType);
+  }
+
+  restoreHandlers() {
+    this.setSortMovieHandler(this._callback.sortMovie);
+  }
+
+  rerenderSort(sortType) {
+    this._currentSortType = sortType;
+    this.updateElement();
   }
 
   _addSortMovieHandler(evt) {
     evt.preventDefault();
+    const sortType = evt.target.getAttribute('data-sort');
 
-    this._callback.sortMovie({
-      isSortDefault: (evt.target.hasAttribute('data-sort-default') && !evt.target.classList.contains('sort__button--active')),
-      isSortDate: (evt.target.hasAttribute('data-sort-date') && !evt.target.classList.contains('sort__button--active')),
-      isSortRating: (evt.target.hasAttribute('data-sort-rating') && !evt.target.classList.contains('sort__button--active')),
-    });
-
-    const allButtons = this.getElement().querySelectorAll('.sort__button');
-    allButtons.forEach((button) => button.classList.remove('sort__button--active'));
-    evt.target.classList.add('sort__button--active');
+    this._callback.sortMovie(sortType);
   }
 
   setSortMovieHandler(callback) {

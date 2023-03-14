@@ -1,5 +1,5 @@
+import he from 'he';
 import { addActiveButtonClass, convertsDate } from '../utils/card';
-import allComments from '../mock/film-comments';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 import Smart from './smart';
 
@@ -13,14 +13,14 @@ const createGenreItem = (items) => {
 const createCommentItem = (items) => {
   const CommentMarkup = items.map((item) => {
     const {
-      user, emotion, commentText, commentDate,
+      id, user, emotion, commentText, commentDate,
     } = item;
-    return `<li class="film-details__comment">
+    return `<li class="film-details__comment" comment-id="${id}">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
-        <p class="film-details__comment-text">${commentText}</p>
+        <p class="film-details__comment-text">${he.encode(commentText)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${user}</span>
           <span class="film-details__comment-day">${convertsDate(commentDate, COMMENT_DATE_FORMAT)}</span>
@@ -32,9 +32,8 @@ const createCommentItem = (items) => {
   return CommentMarkup.join('');
 };
 
-const createFilmDetailsTemplate = (movieCard) => {
+const createFilmDetailsTemplate = (movieCard, cardComments) => {
   const {
-    id,
     name,
     rating,
     poster,
@@ -54,8 +53,6 @@ const createFilmDetailsTemplate = (movieCard) => {
     selectedEmotion,
     commentText,
   } = movieCard;
-
-  const cardComments = allComments[id];
 
   return `<section class="film-details">
     <form class="film-details__inner" action="" method="get">
@@ -170,23 +167,28 @@ const createFilmDetailsTemplate = (movieCard) => {
 };
 
 export default class FilmCardDetails extends Smart {
-  constructor(filmCard) {
+  constructor(filmCard, filmComments) {
     super();
 
     this._filmCardState = FilmCardDetails.parseDataToState(filmCard);
+    this._filmComments = filmComments;
 
     this._clickHandler = this._clickHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
     this._selectEmojiHandler = this._selectEmojiHandler.bind(this);
     this._commentInputHandler = this._commentInputHandler.bind(this);
+    this._addDeleteCommentHandler = this._addDeleteCommentHandler.bind(this);
 
-    this._formImage = this.getElement().querySelector('.film-details__add-emoji-label img');
     this._favoriteButtonWrapper = this.getElement().querySelector('.film-details__controls');
 
     this._setInnerHandlers();
   }
 
   static parseDataToState(filmCard) {
+    if (filmCard.commentText) {
+      return filmCard;
+    }
+
     const filmState = {
       ...filmCard,
       isEmotion: false,
@@ -209,16 +211,20 @@ export default class FilmCardDetails extends Smart {
 
   reset(filmCard) {
     this.updateData(
-      FilmCardDetails.parseDataToState(filmCard),
+      FilmCardDetails.parseStateToData(filmCard),
     );
   }
 
-  getTemplate() {
-    return createFilmDetailsTemplate(this._filmCardState);
+  get state() {
+    return this._filmCardState;
   }
 
-  scrollToFavoriteButton() {
-    this._favoriteButtonWrapper.scrollIntoView({ block: 'center' });
+  getTemplate() {
+    return createFilmDetailsTemplate(this._filmCardState, this._filmComments);
+  }
+
+  scrollToFavoriteButton(buttonPosition) {
+    this.getElement().scrollTo(0, buttonPosition);
   }
 
   _setInnerHandlers() {
@@ -237,6 +243,7 @@ export default class FilmCardDetails extends Smart {
     this._setInnerHandlers();
     this.setSpecialListHandler(this._callback.specialList);
     this.setClickHandler(this._callback.click);
+    this.setDeleteCommentHandler(this._callback.deleteComment);
   }
 
   _commentInputHandler(evt) {
@@ -274,6 +281,7 @@ export default class FilmCardDetails extends Smart {
 
   _addToSpecialListHandler(evt) {
     evt.preventDefault();
+
     this._callback.specialList({
       isAddedToWatchList: evt.target.hasAttribute('data-watchlist'),
       isAddedToWatched: evt.target.hasAttribute('data-watched'),
@@ -288,5 +296,51 @@ export default class FilmCardDetails extends Smart {
       'click',
       this._addToSpecialListHandler,
     );
+  }
+
+  _addDeleteCommentHandler(evt) {
+    if (evt.target.className === 'film-details__comment-delete') {
+      evt.preventDefault();
+
+      const commentId = evt.currentTarget.getAttribute('comment-id');
+      this._callback.deleteComment(commentId);
+    }
+  }
+
+  setDeleteCommentHandler(callback) {
+    this._callback.deleteComment = callback;
+
+    this.getElement().querySelectorAll('.film-details__comment')
+      .forEach((commentItem) => {
+        commentItem.addEventListener('click', this._addDeleteCommentHandler);
+      });
+  }
+
+  updateComment(commentsUpdate) {
+    if (this._filmComments.length < commentsUpdate.length) {
+      this.updateData({
+        isEmotion: false,
+        selectedEmotion: '',
+        commentText: '',
+      });
+    }
+    this._filmComments = commentsUpdate;
+    this.getElement().querySelector('.film-details__comments-list').innerHTML = createCommentItem(this._filmComments);
+    this.getElement().querySelector('.film-details__comments-count').innerHTML = this._filmComments.length;
+    this.setDeleteCommentHandler(this._callback.deleteComment);
+  }
+
+  addComment() {
+    if (!this._filmCardState.selectedEmotion || !this._filmCardState.commentText) {
+      return false;
+    }
+    const newComment = {
+      id: 5,
+      user: 'Non',
+      emotion: this._filmCardState.selectedEmotion,
+      commentText: this._filmCardState.commentText,
+      data: '2020-03-20',
+    };
+    return newComment;
   }
 }

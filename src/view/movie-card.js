@@ -1,11 +1,9 @@
 import AbstractView from './abstract';
 import { addActiveButtonClass, cutText, convertsDate } from '../utils/card';
-import allComments from '../mock/film-comments';
 import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS, MOVIE_CARD_YEAR_FORMAT } from '../constants';
 
-const createMovieCardTemplate = (movieCard) => {
+const createMovieCardTemplate = (movieCard, cardComments) => {
   const {
-    id,
     name,
     rating,
     poster,
@@ -17,8 +15,6 @@ const createMovieCardTemplate = (movieCard) => {
     isWatched,
     isFavorite,
   } = movieCard;
-
-  const cardComments = allComments[id];
 
   const cardDescription = cutText(description, TEXT_LIMIT);
 
@@ -42,16 +38,17 @@ const createMovieCardTemplate = (movieCard) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(filmCard) {
+  constructor(filmCard, filmComments) {
     super();
 
     this._filmCard = filmCard;
+    this._filmComments = filmComments;
     this._openPopupHandler = this._openPopupHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
   }
 
   getTemplate() {
-    return createMovieCardTemplate(this._filmCard);
+    return createMovieCardTemplate(this._filmCard, this._filmComments);
   }
 
   _openPopupHandler(evt) {
@@ -84,5 +81,10 @@ export default class FilmCard extends AbstractView {
       'click',
       this._addToSpecialListHandler,
     );
+  }
+
+  updateCommentCounter(commentsUpdate) {
+    this._filmComments = commentsUpdate;
+    this.getElement().querySelector('.film-card__comments').innerHTML = `${this._filmComments.length} comments`;
   }
 }
