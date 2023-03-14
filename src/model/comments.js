@@ -4,7 +4,7 @@ export default class Comments extends Observer {
   constructor() {
     super();
 
-    this._comments = [];
+    this._comments = {};
   }
 
   set comments(comments) {

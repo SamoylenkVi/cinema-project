@@ -1,7 +1,7 @@
 import EmptyFilmMessageView from '../view/message-empty-film-list';
 import ShowMoreButtonView from '../view/show-more-button';
 import MovieWrapperView from '../view/movie-wrapper';
-import MovieCardPresenter from './movie';
+import MovieCardPresenter from './movie-card';
 import { RenderPosition, UserAction, UpdateType } from '../constants';
 
 import {
@@ -148,7 +148,7 @@ export default class MovieList {
   }
 
   _renderFilmCard(film) {
-    const filmPresenter = new MovieCardPresenter(
+    const movieCardPresenter = new MovieCardPresenter(
       this._movieWrapperList,
       this._handleViewAction,
       this._handleModeChange,
@@ -156,9 +156,9 @@ export default class MovieList {
 
     const filmComments = this._comments[film.id];
 
-    filmPresenter.init(film, filmComments);
+    movieCardPresenter.init(film, filmComments);
 
-    this._filmsPresenter[film.id] = filmPresenter;
+    this._filmsPresenter[film.id] = movieCardPresenter;
   }
 
   _renderNoFilmsMessage() {

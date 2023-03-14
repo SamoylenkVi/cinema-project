@@ -72,10 +72,6 @@ export default class Films extends Observer {
     return this._filteredAndSortedFilms;
   }
 
-  set currentFilterType(filterType) {
-    this._filterType = filterType;
-  }
-
   _updateFilm(film) {
     const index = this._films.findIndex((item) => item.id === film.id);
 

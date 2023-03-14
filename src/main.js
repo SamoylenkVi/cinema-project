@@ -2,14 +2,12 @@ import UserProfileView from './view/user-profile';
 import PagePresenter from './presenter/page';
 import { renderElement } from './utils/render';
 import { generateCardFilm } from './mock/card-film';
-import FilmsModel from './model.js/films';
-import CommentsModel from './model.js/comments';
+import FilmsModel from './model/films';
+import CommentsModel from './model/comments';
 import { FILM_COUNT, RenderPosition } from './constants';
 import allComments from './mock/film-comments';
 
-const filmCards = new Array(FILM_COUNT)
-  .fill()
-  .map((element, idElement) => generateCardFilm(idElement));
+const filmCards = Array.from({ length: FILM_COUNT }, (_, index) => generateCardFilm(index));
 
 const filmsModel = new FilmsModel();
 filmsModel.films = filmCards;
