@@ -1,4 +1,3 @@
-export const FILM_COUNT = 23;
 export const TEXT_LIMIT = 140;
 export const MOVIE_CARD_YEAR_FORMAT = 'YYYY';
 export const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
