@@ -1,5 +1,5 @@
 import he from 'he';
-import { addActiveButtonClass, convertsDate } from '../utils/card';
+import { addActiveButtonClass, convertsDate, humanizedRuntime } from '../utils/card';
 import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
 import Smart from './smart';
 
@@ -34,15 +34,17 @@ const createCommentItem = (items) => {
 
 const createFilmDetailsTemplate = (movieCard, cardComments) => {
   const {
-    name,
+    title,
+    comments,
+    alternativeTitle,
     rating,
     poster,
-    producer,
-    screenwriters,
+    director,
+    writers,
     actors,
     productionYear,
-    filmDuration,
-    country,
+    runtime,
+    productionCountry,
     description,
     isWatchList,
     isWatched,
@@ -63,13 +65,13 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
         <div class="film-details__info-wrap">
           <div class="film-details__poster">
             <img class="film-details__poster-img" src="${poster}" alt="">
-            <p class="film-details__age">${ageRating}</p>
+            <p class="film-details__age">${ageRating}+</p>
           </div>
           <div class="film-details__info">
             <div class="film-details__info-head">
               <div class="film-details__title-wrap">
-                <h3 class="film-details__title">${name}</h3>
-                <p class="film-details__title-original">Original: ${name}</p>
+                <h3 class="film-details__title">${alternativeTitle}</h3>
+                <p class="film-details__title-original">Original: ${title}</p>
               </div>
               <div class="film-details__rating">
                 <p class="film-details__total-rating">${rating}</p>
@@ -78,11 +80,11 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
             <table class="film-details__table">
               <tr class="film-details__row">
                 <td class="film-details__term">Director</td>
-                <td class="film-details__cell">${producer}</td>
+                <td class="film-details__cell">${director}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Writers</td>
-                <td class="film-details__cell">${screenwriters.join(', ')}</td>
+                <td class="film-details__cell">${writers.join(', ')}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Actors</td>
@@ -94,11 +96,11 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>
-                <td class="film-details__cell">${filmDuration}</td>
+                <td class="film-details__cell">${humanizedRuntime(runtime)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Country</td>
-                <td class="film-details__cell">${country}</td>
+                <td class="film-details__cell">${productionCountry}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">${(genre.length > 1 ? 'Genres' : 'Genre')} </td>
@@ -122,10 +124,10 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
 
       <div class="film-details__bottom-container">
         <section class="film-details__comments-wrap">
-          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${cardComments.length}</span></h3>
+          <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            ${createCommentItem(cardComments)}
+            createCommentItem(cardComments)
           </ul>
 
           <div class="film-details__new-comment">

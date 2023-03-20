@@ -1,12 +1,11 @@
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import dayjs from 'dayjs';
-import duration from 'dayjs/plugin/duration';
+// import dayjs from 'dayjs';
+// import duration from 'dayjs/plugin/duration';
 
 import Smart from './smart';
-import { TIME_REG } from '../constants';
 
-dayjs.extend(duration);
+// dayjs.extend(duration);
 
 const renderFilmChart = (chart, genreNames, genreCounts) => {
   const BAR_HEIGHT = 50;
@@ -169,21 +168,15 @@ export default class Statistic extends Smart {
   _calculateStatisticFilm() {
     const initialValue = {
       watchedFilm: 0,
-      totalDuration: dayjs.duration({
-        hours: 0,
-        minutes: 0,
-      }),
+      totalDuration: 0,
       favoriteGenre: {},
     };
 
     this._filmStatistic = this._films.reduce((accumulator, currentValue) => {
       if (currentValue.isWatched) {
         accumulator.watchedFilm += 1;
-        const filmTime = currentValue.filmDuration.match(TIME_REG);
-        const hours = Number(filmTime[1]);
-        const minutes = Number(filmTime[2]);
 
-        accumulator.totalDuration = accumulator.totalDuration.add({ hours, minutes });
+        accumulator.totalDuration += currentValue.runtime;
 
         currentValue.genre.forEach((genre) => {
           if (accumulator.favoriteGenre[genre] !== undefined) {
@@ -198,8 +191,8 @@ export default class Statistic extends Smart {
   }
 
   _humanizeDurationTime() {
-    this._hourDuration = Math.floor(this._filmStatistic.totalDuration.asMinutes() / 60);
-    this._minutesDuration = this._filmStatistic.totalDuration.asMinutes() % 60;
+    this._hourDuration = Math.floor(this._filmStatistic.totalDuration / 60);
+    this._minutesDuration = this._filmStatistic.totalDuration % 60;
   }
 
   _sortedGenreStatistic() {

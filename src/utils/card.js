@@ -22,3 +22,5 @@ export const convertsDate = (date, format) => dayjs(date).format(format);
 export const dateSort = (a, b) => b.productionYear - a.productionYear;
 
 export const ratingSort = (a, b) => b.rating - a.rating;
+
+export const humanizedRuntime = (time) => `${Math.floor(time / 60)}h ${time % 60}m`;

@@ -76,7 +76,7 @@ export default class Films extends Observer {
     const index = this._films.findIndex((item) => item.id === film.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexacting task');
     }
 
     this._films = [
