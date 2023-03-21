@@ -1111,6 +1111,10 @@ button {
   display: none;
 }
 
+.loader-section {
+  height: 100vh;
+}
+
 .loader-text {
   display: flex;
   flex-direction: row;

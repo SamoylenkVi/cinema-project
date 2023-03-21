@@ -55,7 +55,6 @@ export default class MovieList {
 
   init() {
     this._renderFilmsContainer();
-
     this._renderFilmList(this._getFilms());
   }
 
@@ -102,6 +101,11 @@ export default class MovieList {
       case UpdateType.MAJOR:
         this._renderedTaskCount = TASK_COUNT_PER_STEP;
         this._rerenderFilmList(data);
+        break;
+      case UpdateType.INIT:
+        this._films = this._filmsModel.filteredAndSortedFilms;
+        remove(this._emptyFilmMessage);
+        this._renderFilmList(this._films);
         break;
       default:
     }

@@ -2,10 +2,9 @@ import AbstractView from './abstract';
 import {
   addActiveButtonClass,
   cutText,
-  convertsDate,
   humanizedRuntime,
 } from '../utils/card';
-import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS, MOVIE_CARD_YEAR_FORMAT } from '../constants';
+import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
 
 const createMovieCardTemplate = (movieCard) => {
   const {
@@ -28,7 +27,7 @@ const createMovieCardTemplate = (movieCard) => {
   <h3 class="film-card__title">${title}</h3>
   <p class="film-card__rating">${rating}</p>
   <p class="film-card__info">
-    <span class="film-card__year">${convertsDate(productionYear, MOVIE_CARD_YEAR_FORMAT)}</span>
+    <span class="film-card__year">${productionYear}</span>
     <span class="film-card__duration">${humanizedRuntime(runtime)}</span>
     <span class="film-card__genre">${genre[0]}</span>
   </p>

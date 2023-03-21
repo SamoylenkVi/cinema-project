@@ -76,6 +76,12 @@ export default class FilterMenu {
         this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
         this._sortCardMenu.rerenderSort(this._currentSortType);
         break;
+      case UpdateType.INIT:
+        this._films = this._filmsModel.films;
+        this._filteredCount = this._filteredFilm();
+        this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
+        this._sortCardMenu.rerenderSort(this._currentSortType);
+        break;
       default:
     }
   }

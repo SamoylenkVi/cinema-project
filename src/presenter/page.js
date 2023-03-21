@@ -2,8 +2,9 @@ import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
 import StatisticView from '../view/stats';
 import FilterMenuPresenter from './filter-menu';
+import LoadingView from '../view/loading';
 import { RenderPosition, FilterMode, UpdateType } from '../constants';
-import { renderElement } from '../utils/render';
+import { remove, renderElement } from '../utils/render';
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
 const MAIN_FILMS_WRAPPER = 'films-list';
@@ -20,6 +21,8 @@ export default class Page {
 
     this._mainElement = document.querySelector('.main');
 
+    this._isLoading = true;
+    this._loadingView = new LoadingView();
     this._films = this._filmsModel.films;
     this._allMovieWrapper = new GenericMovieWrapperView();
     this._statistic = new StatisticView(this._films);
@@ -49,11 +52,24 @@ export default class Page {
       this._filmsModel,
       this._handleShowStatistic,
     );
+    this._renderPage();
+    this._moviePresenter.init();
+  }
+
+  _renderPage() {
+    if (this._isLoading) {
+      this._renderLoadingView();
+      return;
+    }
+
     this._filterPresenter.init();
     this._renderAllMovieWrapper();
-    this._moviePresenter.init();
     this._renderStatistic();
     this._handleShowFilms();
+  }
+
+  _renderLoadingView() {
+    renderElement(this._mainElement, this._loadingView, RenderPosition.BEFOREEND);
   }
 
   _renderAllMovieWrapper() {
@@ -73,6 +89,14 @@ export default class Page {
     switch (updateType) {
       case UpdateType.PATCH:
         this._statistic.rerenderStatistic(data);
+        this._handleShowFilms();
+        break;
+      case UpdateType.INIT:
+        this._films = this._filmsModel.films;
+        this._isLoading = false;
+        remove(this._loadingView);
+        this._renderPage();
+        this._statistic.rerenderStatistic(this._films);
         this._handleShowFilms();
         break;
       default:

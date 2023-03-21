@@ -1,6 +1,6 @@
 import Observer from '../utils/observer';
-import { SortType, FilterType } from '../constants';
-import { dateSort, ratingSort } from '../utils/card';
+import { SortType, FilterType, MOVIE_CARD_YEAR_FORMAT } from '../constants';
+import { dateSort, ratingSort, convertsDate } from '../utils/card';
 
 const Filter = {
   ALL: '',
@@ -21,10 +21,11 @@ export default class Films extends Observer {
     this._filteredAndSortedFilms = [];
   }
 
-  set films(films) {
+  setFilms(updateType, films) {
     this._films = films.slice();
     this._filterFilms();
     this._sortFilms();
+    this._notify(updateType);
   }
 
   get films() {
@@ -48,7 +49,6 @@ export default class Films extends Observer {
 
   _sortFilms() {
     let sortByType;
-
     switch (this._sortType) {
       case SortType.DATE:
         sortByType = dateSort;
@@ -123,7 +123,8 @@ export default class Films extends Observer {
       writers: movie.film_info.writers,
       actors: movie.film_info.actors,
       rating: movie.film_info.total_rating,
-      productionYear: movie.film_info.release.date,
+      productionYear: convertsDate(movie.film_info.release.date, MOVIE_CARD_YEAR_FORMAT),
+      productionYearIso: movie.film_info.release.date,
       productionCountry: movie.film_info.release.release_country,
       runtime: movie.film_info.runtime,
       genre: movie.film_info.genre,
@@ -150,7 +151,7 @@ export default class Films extends Observer {
         actors: movie.actors,
         rating: movie.rating,
         release: {
-          date: movie.productionYear,
+          date: movie.productionYearIso,
           release_country: movie.productionCountry,
         },
         runtime: movie.runtime,
@@ -161,7 +162,7 @@ export default class Films extends Observer {
       user_details: {
         already_watched: movie.isWatched,
         favorite: movie.isFavorite,
-        watching_date: movie.ageRating,
+        watching_date: movie.watchingDate,
         watchlist: movie.isWatchList,
       },
     };

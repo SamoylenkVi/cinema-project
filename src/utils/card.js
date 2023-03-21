@@ -18,6 +18,7 @@ export const cutText = (text, limit) => {
 export const addActiveButtonClass = (shouldAddClass, className) => (shouldAddClass ? className : '');
 
 export const convertsDate = (date, format) => dayjs(date).format(format);
+export const convertsDateToIso = (date) => dayjs(date).toISOString();
 
 export const dateSort = (a, b) => b.productionYear - a.productionYear;
 
