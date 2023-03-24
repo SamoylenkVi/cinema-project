@@ -1,6 +1,6 @@
 import he from 'he';
 import { addActiveButtonClass, convertsDate, humanizedRuntime } from '../utils/card';
-import { RELEASE_DATE_FORMAT, COMMENT_DATE_FORMAT } from '../constants';
+import { DayFormat } from '../constants';
 import Smart from './smart';
 
 const ACTIVE_BUTTON_CLASS = 'film-details__control-button--active';
@@ -23,7 +23,7 @@ const createCommentItem = (items) => {
         <p class="film-details__comment-text">${he.encode(commentText)}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${user}</span>
-          <span class="film-details__comment-day">${convertsDate(commentDate, COMMENT_DATE_FORMAT)}</span>
+          <span class="film-details__comment-day">${convertsDate(commentDate, DayFormat.DATA_TIME_FORMAT)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -92,7 +92,7 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Release Date</td>
-                <td class="film-details__cell">${convertsDate(productionYear, RELEASE_DATE_FORMAT)}</td>
+                <td class="film-details__cell">${convertsDate(productionYear, DayFormat.FULL_DATA_FORMAT)}</td>
               </tr>
               <tr class="film-details__row">
                 <td class="film-details__term">Runtime</td>

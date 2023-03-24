@@ -23,15 +23,16 @@ export default class Api {
   }
 
   getComments() {
-    return this._load({ url: 'comments/0' })
+    return this._load({ url: 'comments/2' })
       .then(Api.toJSON);
   }
 
-  updateMovies(movie) {
+  updateFilm(movie) {
+    const updateMovie = FilmsModel.adaptToServer(movie);
     return this._load({
-      url: `movies/${movie.id}`,
+      url: `movies/${updateMovie.id}`,
       method: Method.PUT,
-      body: JSON.stringify(movie),
+      body: JSON.stringify(updateMovie),
       headers: new Headers({ 'Content-Type': 'application/json' }),
     })
       .then(Api.toJSON);

@@ -2,6 +2,7 @@ import EmptyFilmMessageView from '../view/message-empty-film-list';
 import ShowMoreButtonView from '../view/show-more-button';
 import MovieWrapperView from '../view/movie-wrapper';
 import MovieCardPresenter from './movie-card';
+import FilmsModel from '../model/films';
 import { RenderPosition, UserAction, UpdateType } from '../constants';
 
 import {
@@ -18,9 +19,11 @@ export default class MovieList {
     containerListAttribute,
     filmsModel,
     commentsModel,
+    api,
   ) {
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
+    this._api = api;
     this._films = this._getFilms();
     this._comments = this._commentsModel.comments;
 
@@ -78,7 +81,10 @@ export default class MovieList {
   _handleViewAction(actionType, updateType, update) {
     switch (actionType) {
       case (UserAction.UPDATE_FILM):
-        this._filmsModel.updateFilms(updateType, update);
+        this._api.updateFilm(update).then((movie) => {
+          const updateMovie = FilmsModel.adaptToClient(movie);
+          this._filmsModel.updateFilms(updateType, updateMovie);
+        });
         break;
       case (UserAction.UPDATE_COMMENTS):
         this._commentsModel.updateComments(updateType, update);

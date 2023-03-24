@@ -18,7 +18,7 @@ const headerElement = document.querySelector('.header');
 
 renderElement(headerElement, new UserProfileView(), RenderPosition.BEFOREEND);
 
-const pagePresenter = new PagePresenter(filmsModel, commentsModel);
+const pagePresenter = new PagePresenter(filmsModel, commentsModel, api);
 pagePresenter.init();
 
 api.getMovies()
