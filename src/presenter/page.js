@@ -1,10 +1,21 @@
+import dayjs from 'dayjs';
+import weekday from 'dayjs/plugin/weekday';
 import GenericMovieWrapperView from '../view/all-movie-wrapper';
 import MovieListPresenter from './movie-list';
 import StatisticView from '../view/stats';
 import FilterMenuPresenter from './filter-menu';
 import LoadingView from '../view/loading';
-import { RenderPosition, FilterMode, UpdateType } from '../constants';
+import {
+  RenderPosition,
+  FilterMode,
+  UpdateType,
+  StatisticPeriod,
+  DayFormat,
+} from '../constants';
 import { remove, renderElement } from '../utils/render';
+import { isInPeriod } from '../utils/card';
+
+dayjs.extend(weekday);
 
 const MAIN_FILMS_TITLE = 'All movies. Upcoming';
 const MAIN_FILMS_WRAPPER = 'films-list';
@@ -16,9 +27,8 @@ const FILMS_LIST_ATTRIBUTE = {
 };
 
 export default class Page {
-  constructor(filmsModel, commentsModel) {
+  constructor(filmsModel, commentsModel, api) {
     this._filmsModel = filmsModel;
-
     this._mainElement = document.querySelector('.main');
 
     this._isLoading = true;
@@ -34,11 +44,13 @@ export default class Page {
       FILMS_LIST_ATTRIBUTE.MAIN,
       filmsModel,
       commentsModel,
+      api,
     );
 
     this._filterPresenter = null;
     this._handleShowStatistic = this._handleShowStatistic.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._selectDatePeriodHandler = this._selectDatePeriodHandler.bind(this);
     this._filmsModel.addObserver(this._handleModelEvent);
   }
 
@@ -78,6 +90,28 @@ export default class Page {
 
   _renderStatistic() {
     renderElement(this._mainElement, this._statistic, RenderPosition.BEFOREEND);
+    this._statistic.setDatePeriodHandler(this._selectDatePeriodHandler);
+  }
+
+  _selectDatePeriodHandler(datePeriod) {
+    const filterFilm = this._films.filter((film) => film.isWatched);
+    switch (datePeriod) {
+      case StatisticPeriod.DAY:
+        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.FULL_DATA_FORMAT));
+        break;
+      case StatisticPeriod.WEEK:
+        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.FULL_DATA_FORMAT, true));
+        break;
+      case StatisticPeriod.MONTH:
+        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.MONTH_FORMAT));
+        break;
+      case StatisticPeriod.YEAR:
+        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.YEAR_FORMAT));
+        break;
+      default:
+        this._statistic.rerenderStatistic(filterFilm);
+        break;
+    }
   }
 
   _handleShowFilms() {

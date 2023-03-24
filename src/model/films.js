@@ -1,5 +1,5 @@
 import Observer from '../utils/observer';
-import { SortType, FilterType, MOVIE_CARD_YEAR_FORMAT } from '../constants';
+import { SortType, FilterType, DayFormat } from '../constants';
 import { dateSort, ratingSort, convertsDate } from '../utils/card';
 
 const Filter = {
@@ -123,7 +123,7 @@ export default class Films extends Observer {
       writers: movie.film_info.writers,
       actors: movie.film_info.actors,
       rating: movie.film_info.total_rating,
-      productionYear: convertsDate(movie.film_info.release.date, MOVIE_CARD_YEAR_FORMAT),
+      productionYear: convertsDate(movie.film_info.release.date, DayFormat.YEAR_FORMAT),
       productionYearIso: movie.film_info.release.date,
       productionCountry: movie.film_info.release.release_country,
       runtime: movie.film_info.runtime,
@@ -149,7 +149,7 @@ export default class Films extends Observer {
         director: movie.director,
         writers: movie.writers,
         actors: movie.actors,
-        rating: movie.rating,
+        total_rating: movie.rating,
         release: {
           date: movie.productionYearIso,
           release_country: movie.productionCountry,

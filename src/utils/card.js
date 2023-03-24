@@ -25,3 +25,24 @@ export const dateSort = (a, b) => b.productionYear - a.productionYear;
 export const ratingSort = (a, b) => b.rating - a.rating;
 
 export const humanizedRuntime = (time) => `${Math.floor(time / 60)}h ${time % 60}m`;
+
+export const isInPeriod = (films, dateFormat, isWeekPeriod) => {
+  let startWeek;
+  let endWeek;
+  const currentDay = convertsDate(dayjs(), dateFormat);
+
+  if (isWeekPeriod) {
+    startWeek = convertsDate((dayjs().weekday(1)), dateFormat);
+    endWeek = convertsDate((dayjs().weekday(7)), dateFormat);
+  }
+
+  const filmsInPeriod = films.filter((film) => {
+    const filmWatchedDay = convertsDate(film.watchingDate, dateFormat);
+    if (isWeekPeriod) {
+      return (filmWatchedDay >= startWeek && filmWatchedDay <= endWeek);
+    }
+    return String(currentDay) === String(filmWatchedDay);
+  });
+
+  return filmsInPeriod;
+};
