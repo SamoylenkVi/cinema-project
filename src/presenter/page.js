@@ -62,6 +62,7 @@ export default class Page {
       this._mainElement,
       this._filmsModel,
       this._handleShowStatistic,
+      this._selectDatePeriodHandler,
     );
     this._renderPage();
     this._moviePresenter.init();
@@ -93,6 +94,7 @@ export default class Page {
   }
 
   _selectDatePeriodHandler(datePeriod) {
+    this._films = this._filmsModel.films;
     const filterFilm = this._films.filter((film) => film.isWatched);
     switch (datePeriod) {
       case StatisticPeriod.DAY:
