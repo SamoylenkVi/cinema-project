@@ -43,17 +43,15 @@ const createMovieCardTemplate = (movieCard) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(filmCard, filmComments) {
+  constructor(filmCard) {
     super();
-
     this._filmCard = filmCard;
-    this._filmComments = filmComments;
     this._openPopupHandler = this._openPopupHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
   }
 
   getTemplate() {
-    return createMovieCardTemplate(this._filmCard, this._filmComments);
+    return createMovieCardTemplate(this._filmCard);
   }
 
   _openPopupHandler(evt) {
@@ -86,10 +84,5 @@ export default class FilmCard extends AbstractView {
       'click',
       this._addToSpecialListHandler,
     );
-  }
-
-  updateCommentCounter(commentsUpdate) {
-    this._filmComments = commentsUpdate;
-    this.getElement().querySelector('.film-card__comments').innerHTML = `${this._filmComments.length} comments`;
   }
 }

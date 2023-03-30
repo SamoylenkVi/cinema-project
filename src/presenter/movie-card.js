@@ -1,5 +1,6 @@
 import FilmCardView from '../view/movie-card';
 import FilmCardDetailsView from '../view/film-details';
+
 import {
   Keys,
   RenderPosition,
@@ -17,10 +18,11 @@ const Mode = {
   POPUP: 'POPUP',
 };
 export default class MovieCard {
-  constructor(wrapper, changeData, modeChange) {
+  constructor(wrapper, changeData, modeChange, api) {
     this.wrapperCard = wrapper;
     this.changeData = changeData;
     this.changeMode = modeChange;
+    this._api = api;
 
     this.filmDetailsWrapper = document.querySelector('.main');
     this._page = document.querySelector('body');
@@ -38,13 +40,12 @@ export default class MovieCard {
     this._addFilmToSpecialList = this._addFilmToSpecialList.bind(this);
   }
 
-  init(filmCard, filmComments) {
+  init(filmCard) {
     this._filmCardData = filmCard;
-    this._filmComments = filmComments;
     this._filmId = this._filmCardData.id;
     const prevFilmCard = this._filmCard;
 
-    this._filmCard = new FilmCardView(this._filmCardData, this._filmComments);
+    this._filmCard = new FilmCardView(this._filmCardData);
 
     this._filmCard.setOpenPopupHandler(this._showFilmDetailsHandler);
     this._filmCard.setSpecialListHandler(this._addFilmToSpecialList);
@@ -91,14 +92,34 @@ export default class MovieCard {
     this._filmCardDetails.setDeleteCommentHandler(this._deleteComment);
   }
 
-  updateComments(update) {
-    this._filmComments = update[this._filmId];
-    this._filmCard.updateCommentCounter(this._filmComments);
+  deleteComment(commentId) {
+    this._filmComments = this._filmComments.filter((comment) => comment.id !== commentId);
     this._filmCardDetails.updateComment(this._filmComments);
   }
 
+  addComment(comments) {
+    this._filmComments = comments.slice();
+    this._filmCardDetails.updateComment(this._filmComments);
+  }
+
+  showError(commentId) {
+    if (commentId) {
+      this._filmCardDetails.setCommentErrorView(commentId);
+    } else {
+      this._filmCardDetails.setFormErrorView();
+    }
+  }
+
   _showFilmDetailsHandler() {
-    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData, this._filmComments);
+    this._api.getComments(this._filmCardData.id)
+      .then((comments) => {
+        this._filmComments = comments;
+        this._renderFilmCardDetails(this._filmComments);
+      });
+  }
+
+  _renderFilmCardDetails(comments) {
+    this._filmCardDetails = new FilmCardDetailsView(this._filmCardData, comments);
 
     this._prevFilmCardDetails = this._filmCardDetails;
     this.filmDetailsWrapper.appendChild(this._filmCardDetails.getElement());
@@ -133,21 +154,12 @@ export default class MovieCard {
     if (evt.code === Keys.ENTER && (evt[Keys.COMMAND] || evt[Keys.CONTROL])) {
       const newComment = this._filmCardDetails.addComment();
 
-      if (newComment) {
-        this._filmComments = [
-          ...this._filmComments.slice(),
-          newComment,
-        ];
-        const updateComments = {
-          [this._filmId]: this._filmComments,
-        };
-
-        this.changeData(
-          UserAction.UPDATE_COMMENTS,
-          UpdateType.PATCH,
-          updateComments,
-        );
-      }
+      this.changeData(
+        UserAction.ADD_COMMENT,
+        UpdateType.PATCH,
+        newComment,
+        this._filmCardData.id,
+      );
     }
   }
 
@@ -200,14 +212,15 @@ export default class MovieCard {
   }
 
   _deleteComment(commentId) {
-    const updateComments = {
-      [this._filmId]: this._filmComments.filter(({ id }) => id !== Number(commentId)),
+    const updateFilm = {
+      ...this._filmCardData,
+      comments: this._filmCardData.comments.filter((id) => id !== commentId),
     };
-
     this.changeData(
-      UserAction.UPDATE_COMMENTS,
+      UserAction.DELETE_COMMENTS,
       UpdateType.PATCH,
-      updateComments,
+      updateFilm,
+      commentId,
     );
   }
 }

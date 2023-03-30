@@ -27,7 +27,7 @@ const FILMS_LIST_ATTRIBUTE = {
 };
 
 export default class Page {
-  constructor(filmsModel, commentsModel, api) {
+  constructor(filmsModel, api) {
     this._filmsModel = filmsModel;
     this._mainElement = document.querySelector('.main');
 
@@ -43,7 +43,6 @@ export default class Page {
       MAIN_FILMS_TITLE,
       FILMS_LIST_ATTRIBUTE.MAIN,
       filmsModel,
-      commentsModel,
       api,
     );
 

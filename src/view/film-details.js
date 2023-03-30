@@ -13,17 +13,17 @@ const createGenreItem = (items) => {
 const createCommentItem = (items) => {
   const CommentMarkup = items.map((item) => {
     const {
-      id, user, emotion, commentText, commentDate,
+      id, author, emotion, comment, date,
     } = item;
     return `<li class="film-details__comment" comment-id="${id}">
       <span class="film-details__comment-emoji">
         <img src="./images/emoji/${emotion}.png" width="55" height="55" alt="emoji-smile">
       </span>
       <div>
-        <p class="film-details__comment-text">${he.encode(commentText)}</p>
+        <p class="film-details__comment-text">${he.encode(comment)}</p>
         <p class="film-details__comment-info">
-          <span class="film-details__comment-author">${user}</span>
-          <span class="film-details__comment-day">${convertsDate(commentDate, DayFormat.DATA_TIME_FORMAT)}</span>
+          <span class="film-details__comment-author">${author}</span>
+          <span class="film-details__comment-day">${convertsDate(date, DayFormat.DATA_TIME_FORMAT)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -127,7 +127,7 @@ const createFilmDetailsTemplate = (movieCard, cardComments) => {
           <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
           <ul class="film-details__comments-list">
-            createCommentItem(cardComments)
+           ${createCommentItem(cardComments)}
           </ul>
 
           <div class="film-details__new-comment">
@@ -301,7 +301,11 @@ export default class FilmCardDetails extends Smart {
   }
 
   _addDeleteCommentHandler(evt) {
-    if (evt.target.className === 'film-details__comment-delete') {
+    const deleteButton = evt.target;
+
+    if (deleteButton.className === 'film-details__comment-delete') {
+      deleteButton.innerHTML = 'Deleting...';
+      deleteButton.setAttribute('disabled', 'disabled');
       evt.preventDefault();
 
       const commentId = evt.currentTarget.getAttribute('comment-id');
@@ -316,6 +320,26 @@ export default class FilmCardDetails extends Smart {
       .forEach((commentItem) => {
         commentItem.addEventListener('click', this._addDeleteCommentHandler);
       });
+  }
+
+  setCommentErrorView(commentId) {
+    const errorComment = this.getElement().querySelector(`[comment-id="${commentId}"]`);
+    const deleteButton = errorComment.querySelector('.film-details__comment-delete');
+    deleteButton.innerHTML = 'Delete';
+    deleteButton.removeAttribute('disabled');
+    this.setShakeClass(errorComment);
+  }
+
+  setFormErrorView() {
+    const formWrapper = this.getElement().querySelector('.film-details__new-comment');
+    this.setShakeClass(formWrapper);
+  }
+
+  setShakeClass(errorElement) {
+    errorElement.classList.add('shake');
+    setTimeout(() => {
+      errorElement.classList.remove('shake');
+    }, 500);
   }
 
   updateComment(commentsUpdate) {
@@ -336,12 +360,10 @@ export default class FilmCardDetails extends Smart {
     if (!this._filmCardState.selectedEmotion || !this._filmCardState.commentText) {
       return false;
     }
+
     const newComment = {
-      id: 5,
-      user: 'Non',
       emotion: this._filmCardState.selectedEmotion,
-      commentText: this._filmCardState.commentText,
-      data: '2020-03-20',
+      comment: this._filmCardState.commentText,
     };
     return newComment;
   }
