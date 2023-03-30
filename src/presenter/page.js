@@ -99,7 +99,7 @@ export default class Page {
         this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.FULL_DATA_FORMAT));
         break;
       case StatisticPeriod.WEEK:
-        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.FULL_DATA_FORMAT, true));
+        this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.WEEK_FORMAT, true));
         break;
       case StatisticPeriod.MONTH:
         this._statistic.rerenderStatistic(isInPeriod(filterFilm, DayFormat.MONTH_FORMAT));

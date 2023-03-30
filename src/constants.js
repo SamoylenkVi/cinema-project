@@ -58,6 +58,7 @@ export const StatisticPeriod = {
 
 export const DayFormat = {
   MONTH_FORMAT: 'MM YYYY',
+  WEEK_FORMAT: 'YYYY-MM-DD',
   YEAR_FORMAT: 'YYYY',
   FULL_DATA_FORMAT: 'DD MMMM YYYY',
   DATA_TIME_FORMAT: 'YYYY/MM/DD HH:m',

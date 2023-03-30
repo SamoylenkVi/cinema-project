@@ -39,9 +39,11 @@ export const isInPeriod = (films, dateFormat, isWeekPeriod) => {
   const filmsInPeriod = films.filter((film) => {
     const filmWatchedDay = convertsDate(film.watchingDate, dateFormat);
     if (isWeekPeriod) {
-      return (filmWatchedDay >= startWeek && filmWatchedDay <= endWeek);
+      const dayDifferenceFirstWeek = dayjs(filmWatchedDay).diff(dayjs(startWeek), 'day');
+      const dayDifferenceAfterWeek = dayjs(endWeek).diff(dayjs(filmWatchedDay), 'day');
+      return (dayDifferenceFirstWeek >= 0 && dayDifferenceAfterWeek <= 7);
     }
-    return String(currentDay) === String(filmWatchedDay);
+    return currentDay === filmWatchedDay;
   });
 
   return filmsInPeriod;
