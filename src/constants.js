@@ -1,10 +1,6 @@
-export const FILM_COUNT = 23;
 export const TEXT_LIMIT = 140;
-export const MOVIE_CARD_YEAR_FORMAT = 'YYYY';
-export const RELEASE_DATE_FORMAT = 'DD MMMM YYYY';
-export const COMMENT_DATE_FORMAT = 'YYYY/MM/DD HH:m';
-export const TIME_REG = /(\d+)h\s(\d+)m/i;
 export const ACTIVE_BUTTON_CLASS = 'film-card__controls-item--active';
+
 export const Keys = {
   ESCAPE: 'Escape',
   ESC: 'Esc',
@@ -39,7 +35,8 @@ export const FilterMode = {
 
 export const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
-  UPDATE_COMMENTS: 'UPDATE_COMMENTS',
+  DELETE_COMMENTS: 'DELETE_COMMENTS',
+  ADD_COMMENT: 'ADD_COMMENT',
   SORT_FILMS: 'SORT_FILMS',
   FILTER_FILMS: 'FILTER_FILMS',
 };
@@ -48,4 +45,21 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
+};
+
+export const StatisticPeriod = {
+  All: 'all-time',
+  DAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
+export const DayFormat = {
+  MONTH_FORMAT: 'MM YYYY',
+  WEEK_FORMAT: 'YYYY-MM-DD',
+  YEAR_FORMAT: 'YYYY',
+  FULL_DATA_FORMAT: 'DD MMMM YYYY',
+  DATA_TIME_FORMAT: 'YYYY/MM/DD HH:m',
 };

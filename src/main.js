@@ -1,23 +1,29 @@
 import UserProfileView from './view/user-profile';
 import PagePresenter from './presenter/page';
 import { renderElement } from './utils/render';
-import { generateCardFilm } from './mock/card-film';
 import FilmsModel from './model/films';
-import CommentsModel from './model/comments';
-import { FILM_COUNT, RenderPosition } from './constants';
-import allComments from './mock/film-comments';
+import { RenderPosition, UpdateType } from './constants';
+import Api from './api';
 
-const filmCards = Array.from({ length: FILM_COUNT }, (_, index) => generateCardFilm(index));
+const AUTHORIZATION = 'Basic 1qA2ws3eD4rf5tG';
+const END_POINT = 'https://14.ecmascript.pages.academy/cinemaddict';
+
+const api = new Api(END_POINT, AUTHORIZATION);
 
 const filmsModel = new FilmsModel();
-filmsModel.films = filmCards;
-
-const commentsModel = new CommentsModel();
-commentsModel.comments = allComments;
 
 const headerElement = document.querySelector('.header');
 
 renderElement(headerElement, new UserProfileView(), RenderPosition.BEFOREEND);
 
-const pagePresenter = new PagePresenter(filmsModel, commentsModel);
+const pagePresenter = new PagePresenter(filmsModel, api);
 pagePresenter.init();
+
+api.getMovies()
+  .then((movies) => {
+    filmsModel.setFilms(UpdateType.INIT, movies);
+  })
+
+  .catch(() => {
+    filmsModel.setFilms(UpdateType.INIT, []);
+  });

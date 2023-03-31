@@ -2,6 +2,7 @@ import EmptyFilmMessageView from '../view/message-empty-film-list';
 import ShowMoreButtonView from '../view/show-more-button';
 import MovieWrapperView from '../view/movie-wrapper';
 import MovieCardPresenter from './movie-card';
+import FilmsModel from '../model/films';
 import { RenderPosition, UserAction, UpdateType } from '../constants';
 
 import {
@@ -17,12 +18,11 @@ export default class MovieList {
     title,
     containerListAttribute,
     filmsModel,
-    commentsModel,
+    api,
   ) {
     this._filmsModel = filmsModel;
-    this._commentsModel = commentsModel;
+    this._api = api;
     this._films = this._getFilms();
-    this._comments = this._commentsModel.comments;
 
     this._filmContainer = filmContainer;
     this._emptyFilmMessage = new EmptyFilmMessageView();
@@ -31,11 +31,9 @@ export default class MovieList {
     this._handleLoadMoreButtonClick = this._handleLoadMoreButtonClick.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._handleModelCommentsEvent = this._handleModelCommentsEvent.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
 
     this._filmsModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelCommentsEvent);
 
     this._movieWrapper = new MovieWrapperView(
       classNameSection,
@@ -55,7 +53,6 @@ export default class MovieList {
 
   init() {
     this._renderFilmsContainer();
-
     this._renderFilmList(this._getFilms());
   }
 
@@ -76,13 +73,35 @@ export default class MovieList {
     this._filmPopupPresenter = filmPresenter;
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateType, update, id) {
     switch (actionType) {
       case (UserAction.UPDATE_FILM):
-        this._filmsModel.updateFilms(updateType, update);
+        this._api.updateFilm(update).then((movie) => {
+          const updateMovie = FilmsModel.adaptToClient(movie);
+          this._filmsModel.updateFilms(updateType, updateMovie);
+        });
         break;
-      case (UserAction.UPDATE_COMMENTS):
-        this._commentsModel.updateComments(updateType, update);
+      case (UserAction.DELETE_COMMENTS):
+        this._api.deleteComment(id)
+          .then(() => {
+            this._filmPopupPresenter.deleteComment(id);
+            this._filmsModel.updateFilms(updateType, update);
+          })
+          .catch(() => {
+            this._filmPopupPresenter.showError(id);
+          });
+        break;
+      case (UserAction.ADD_COMMENT):
+        this._api.addComments(id, update)
+          .then((updateFilm) => {
+            const { movie, comments } = updateFilm;
+            const updateMovie = FilmsModel.adaptToClient(movie);
+            this._filmsModel.updateFilms(updateType, updateMovie);
+            this._filmPopupPresenter.addComment(comments);
+          })
+          .catch(() => {
+            this._filmPopupPresenter.showError();
+          });
         break;
       default:
     }
@@ -103,18 +122,10 @@ export default class MovieList {
         this._renderedTaskCount = TASK_COUNT_PER_STEP;
         this._rerenderFilmList(data);
         break;
-      default:
-    }
-  }
-
-  _handleModelCommentsEvent(updateType, update) {
-    switch (updateType) {
-      case UpdateType.PATCH:
-        if (this._filmPopupPresenter) {
-          this._comments = this._commentsModel.comments;
-          this._filmPopupPresenter.updateComments(update);
-          this._rerenderFilmList(this._films);
-        }
+      case UpdateType.INIT:
+        this._films = this._filmsModel.filteredAndSortedFilms;
+        remove(this._emptyFilmMessage);
+        this._renderFilmList(this._films);
         break;
       default:
     }
@@ -152,11 +163,10 @@ export default class MovieList {
       this._movieWrapperList,
       this._handleViewAction,
       this._handleModeChange,
+      this._api,
     );
 
-    const filmComments = this._comments[film.id];
-
-    movieCardPresenter.init(film, filmComments);
+    movieCardPresenter.init(film);
 
     this._filmsPresenter[film.id] = movieCardPresenter;
   }

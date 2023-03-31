@@ -1,14 +1,19 @@
 import AbstractView from './abstract';
-import { addActiveButtonClass, cutText, convertsDate } from '../utils/card';
-import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS, MOVIE_CARD_YEAR_FORMAT } from '../constants';
+import {
+  addActiveButtonClass,
+  cutText,
+  humanizedRuntime,
+} from '../utils/card';
+import { TEXT_LIMIT, ACTIVE_BUTTON_CLASS } from '../constants';
 
-const createMovieCardTemplate = (movieCard, cardComments) => {
+const createMovieCardTemplate = (movieCard) => {
   const {
-    name,
+    comments,
+    title,
     rating,
     poster,
     productionYear,
-    filmDuration,
+    runtime,
     genre,
     description,
     isWatchList,
@@ -19,16 +24,16 @@ const createMovieCardTemplate = (movieCard, cardComments) => {
   const cardDescription = cutText(description, TEXT_LIMIT);
 
   return `<article class="film-card">
-  <h3 class="film-card__title">${name}</h3>
+  <h3 class="film-card__title">${title}</h3>
   <p class="film-card__rating">${rating}</p>
   <p class="film-card__info">
-    <span class="film-card__year">${convertsDate(productionYear, MOVIE_CARD_YEAR_FORMAT)}</span>
-    <span class="film-card__duration">${filmDuration}</span>
+    <span class="film-card__year">${productionYear}</span>
+    <span class="film-card__duration">${humanizedRuntime(runtime)}</span>
     <span class="film-card__genre">${genre[0]}</span>
   </p>
   <img src="${poster}" alt="" class="film-card__poster">
   <p class="film-card__description">${cardDescription}</p>
-  <a class="film-card__comments"> ${cardComments.length} comments</a>
+  <a class="film-card__comments"> ${comments.length} comments</a>
   <div class="film-card__controls">
     <button class="film-card__controls-item ${addActiveButtonClass(isWatchList, ACTIVE_BUTTON_CLASS)} film-card__controls-item--add-to-watchlist" data-watchlist type="button">Add to watchlist</button>
     <button class="film-card__controls-item ${addActiveButtonClass(isWatched, ACTIVE_BUTTON_CLASS)} film-card__controls-item--mark-as-watched" data-watched type="button">Mark as watched</button>
@@ -38,17 +43,15 @@ const createMovieCardTemplate = (movieCard, cardComments) => {
 };
 
 export default class FilmCard extends AbstractView {
-  constructor(filmCard, filmComments) {
+  constructor(filmCard) {
     super();
-
     this._filmCard = filmCard;
-    this._filmComments = filmComments;
     this._openPopupHandler = this._openPopupHandler.bind(this);
     this._addToSpecialListHandler = this._addToSpecialListHandler.bind(this);
   }
 
   getTemplate() {
-    return createMovieCardTemplate(this._filmCard, this._filmComments);
+    return createMovieCardTemplate(this._filmCard);
   }
 
   _openPopupHandler(evt) {
@@ -81,10 +84,5 @@ export default class FilmCard extends AbstractView {
       'click',
       this._addToSpecialListHandler,
     );
-  }
-
-  updateCommentCounter(commentsUpdate) {
-    this._filmComments = commentsUpdate;
-    this.getElement().querySelector('.film-card__comments').innerHTML = `${this._filmComments.length} comments`;
   }
 }

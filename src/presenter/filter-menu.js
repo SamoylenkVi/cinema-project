@@ -11,10 +11,11 @@ import {
 } from '../constants';
 
 export default class FilterMenu {
-  constructor(filterContainer, filmsModel, handleStatistic) {
+  constructor(filterContainer, filmsModel, handleStatistic, rerenderStatistic) {
     this._filterContainer = filterContainer;
     this._filmsModel = filmsModel;
     this._handleStatistic = handleStatistic;
+    this._rerenderStatistic = rerenderStatistic;
     this._films = this._filmsModel.films;
 
     this.filterMode = FilterMode.MOVIES;
@@ -76,6 +77,12 @@ export default class FilterMenu {
         this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
         this._sortCardMenu.rerenderSort(this._currentSortType);
         break;
+      case UpdateType.INIT:
+        this._films = this._filmsModel.films;
+        this._filteredCount = this._filteredFilm();
+        this._filterMenu.rerenderFilter(this._filteredCount, this._currentFilterType);
+        this._sortCardMenu.rerenderSort(this._currentSortType);
+        break;
       default:
     }
   }
@@ -104,6 +111,10 @@ export default class FilterMenu {
   _handleFilterMovieCard(filterType) {
     if (this._currentFilterType === filterType) {
       return;
+    }
+
+    if (this._currentFilterType === FilterType.STATISTIC) {
+      this._rerenderStatistic();
     }
     this._handleViewAction(UserAction.FILTER_FILMS, UpdateType.MAJOR, filterType);
 

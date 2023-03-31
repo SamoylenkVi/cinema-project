@@ -1,6 +1,6 @@
 import Observer from '../utils/observer';
-import { SortType, FilterType } from '../constants';
-import { dateSort, ratingSort } from '../utils/card';
+import { SortType, FilterType, DayFormat } from '../constants';
+import { dateSort, ratingSort, convertsDate } from '../utils/card';
 
 const Filter = {
   ALL: '',
@@ -21,10 +21,11 @@ export default class Films extends Observer {
     this._filteredAndSortedFilms = [];
   }
 
-  set films(films) {
+  setFilms(updateType, films) {
     this._films = films.slice();
     this._filterFilms();
     this._sortFilms();
+    this._notify(updateType);
   }
 
   get films() {
@@ -48,7 +49,6 @@ export default class Films extends Observer {
 
   _sortFilms() {
     let sortByType;
-
     switch (this._sortType) {
       case SortType.DATE:
         sortByType = dateSort;
@@ -76,7 +76,7 @@ export default class Films extends Observer {
     const index = this._films.findIndex((item) => item.id === film.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexacting task');
     }
 
     this._films = [
@@ -110,5 +110,62 @@ export default class Films extends Observer {
     this._sortFilms();
 
     this._notify(updateType, this._filteredAndSortedFilms, '');
+  }
+
+  static adaptToClient(movie) {
+    const adaptedMovie = {
+      id: movie.id,
+      comments: movie.comments,
+      poster: movie.film_info.poster,
+      title: movie.film_info.title,
+      alternativeTitle: movie.film_info.alternative_title,
+      director: movie.film_info.director,
+      writers: movie.film_info.writers,
+      actors: movie.film_info.actors,
+      rating: movie.film_info.total_rating,
+      productionYear: convertsDate(movie.film_info.release.date, DayFormat.YEAR_FORMAT),
+      productionYearIso: movie.film_info.release.date,
+      productionCountry: movie.film_info.release.release_country,
+      runtime: movie.film_info.runtime,
+      genre: movie.film_info.genre,
+      description: movie.film_info.description,
+      ageRating: movie.film_info.age_rating,
+      watchingDate: movie.user_details.watching_date,
+      isWatchList: movie.user_details.watchlist,
+      isWatched: movie.user_details.already_watched,
+      isFavorite: movie.user_details.favorite,
+    };
+    return adaptedMovie;
+  }
+
+  static adaptToServer(movie) {
+    const adaptedMovie = {
+      id: movie.id,
+      comments: movie.comments,
+      film_info: {
+        poster: movie.poster,
+        title: movie.title,
+        alternative_title: movie.alternativeTitle,
+        director: movie.director,
+        writers: movie.writers,
+        actors: movie.actors,
+        total_rating: movie.rating,
+        release: {
+          date: movie.productionYearIso,
+          release_country: movie.productionCountry,
+        },
+        runtime: movie.runtime,
+        genre: movie.genre,
+        description: movie.description,
+        age_rating: movie.ageRating,
+      },
+      user_details: {
+        already_watched: movie.isWatched,
+        favorite: movie.isFavorite,
+        watching_date: movie.watchingDate,
+        watchlist: movie.isWatchList,
+      },
+    };
+    return adaptedMovie;
   }
 }
